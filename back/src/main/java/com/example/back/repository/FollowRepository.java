@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,5 +39,10 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
 
     @Query("select f.following.id from Follow f where f.follower.id = :followerId and f.following.id in :targetIds")
     List<Long> findFollowingIds(Long followerId, List<Long> targetIds);
+
+    long countByFollowing_Id(Long userId);
+
+    @Query("select function('date', f.createdAt), count(f) from Follow f where f.following.id = :userId and f.createdAt between :start and :end group by function('date', f.createdAt) order by function('date', f.createdAt)")
+    List<Object[]> countDailyFollowers(Long userId, LocalDateTime start, LocalDateTime end);
 }
 

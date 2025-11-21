@@ -80,7 +80,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         boolean rememberMe = Boolean.TRUE.equals(request.getRememberMe());
-        String token = jwtUtil.generateToken(user.getId(), user.getUsername(), rememberMe);
+        String token = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getRole(), rememberMe);
 
         LoginResponse.UserInfo userInfo = new LoginResponse.UserInfo(
                 user.getId(),

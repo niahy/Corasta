@@ -1,3 +1,10 @@
+    /**
+     * 生成Token
+     */
+    public String generateToken(Long userId, String username, Integer role) {
+        return generateToken(userId, username, role, false);
+    }
+    
 package com.example.back.util;
 
 import io.jsonwebtoken.Claims;
@@ -31,28 +38,19 @@ public class JwtUtil {
     private Long rememberMeExpiration;
     
     /**
-     * 生成Token
-     *
-     * @param userId   用户ID
-     * @param username 用户名
-     * @return Token字符串
-     */
-    public String generateToken(Long userId, String username) {
-        return generateToken(userId, username, false);
-    }
-    
-    /**
      * 生成Token（支持记住我）
      *
      * @param userId    用户ID
      * @param username  用户名
+     * @param role      用户角色
      * @param rememberMe 是否记住我
      * @return Token字符串
      */
-    public String generateToken(Long userId, String username, boolean rememberMe) {
+    public String generateToken(Long userId, String username, Integer role, boolean rememberMe) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);
         claims.put("username", username);
+        claims.put("role", role);
         
         long expirationTime = rememberMe ? rememberMeExpiration : expiration;
         Date expirationDate = new Date(System.currentTimeMillis() + expirationTime);
@@ -103,6 +101,14 @@ public class JwtUtil {
     public String getUsernameFromToken(String token) {
         Claims claims = getClaimsFromToken(token);
         return claims.getSubject();
+    }
+
+    /**
+     * 从Token中获取角色
+     */
+    public Integer getRoleFromToken(String token) {
+        Claims claims = getClaimsFromToken(token);
+        return claims.get("role", Integer.class);
     }
     
     /**

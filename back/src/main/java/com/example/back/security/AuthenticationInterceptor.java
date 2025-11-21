@@ -31,7 +31,8 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
             }
             Long userId = jwtUtil.getUserIdFromToken(token);
             String username = jwtUtil.getUsernameFromToken(token);
-            AuthContextHolder.set(new AuthUser(userId, username));
+            Integer role = jwtUtil.getRoleFromToken(token);
+            AuthContextHolder.set(new AuthUser(userId, username, role));
         }
         return true;
     }

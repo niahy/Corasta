@@ -1,5 +1,7 @@
 package com.example.back.context;
 
+import com.example.back.common.Constants;
+import com.example.back.exception.ForbiddenException;
 import com.example.back.exception.UnauthorizedException;
 
 import java.util.Optional;
@@ -28,6 +30,14 @@ public final class AuthContextHolder {
 
     public static Long requireUserId() {
         return requireUser().getId();
+    }
+
+    public static AuthUser requireAdmin() {
+        AuthUser user = requireUser();
+        if (!Integer.valueOf(Constants.USER_ROLE_ADMIN).equals(user.getRole())) {
+            throw new ForbiddenException("需要超级管理员权限");
+        }
+        return user;
     }
 
     public static void clear() {

@@ -1,6 +1,8 @@
 package com.example.back.repository;
 
 import com.example.back.entity.Like;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -18,5 +20,7 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
     Long countByTargetTypeAndTargetId(String targetType, Long targetId);
 
     void deleteByUser_IdAndTargetTypeAndTargetId(Long userId, String targetType, Long targetId);
+
+    Page<Like> findByUser_IdOrderByCreatedAtDesc(Long userId, Pageable pageable);
 }
 
