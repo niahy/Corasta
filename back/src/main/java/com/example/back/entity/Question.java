@@ -37,7 +37,7 @@ public class Question extends BaseEntity {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "best_answer_id")
     private Answer bestAnswer;
 
@@ -90,6 +90,14 @@ public class Question extends BaseEntity {
 
     public void increaseViewCount() {
         this.viewCount = this.viewCount + 1;
+    }
+
+    public void increaseFollowCount() {
+        this.followCount = this.followCount + 1;
+    }
+
+    public void decreaseFollowCount() {
+        this.followCount = Math.max(0, this.followCount - 1);
     }
 }
 
