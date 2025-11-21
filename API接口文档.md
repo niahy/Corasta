@@ -2308,6 +2308,143 @@ Authorization: Bearer {token}  // 需要认证的接口
 
 ---
 
+### 3.9 内容管理后台模块
+
+> **说明：** 本模块为普通用户管理自己内容与数据的后台面板，不涉及第三阶段的超级管理员功能。
+
+#### 3.9.1 仪表盘概览
+
+**接口：** `GET /dashboard/overview`
+
+**说明：** 返回当前登录用户的内容统计、最近内容以及待处理事项。
+
+**响应：**
+
+```json
+{
+  "code": 200,
+  "data": {
+    "stats": {
+      "articleCount": 12,
+      "draftCount": 3,
+      "questionCount": 4,
+      "answerCount": 18,
+      "followerCount": 56,
+      "totalViews": 1200,
+      "totalLikes": 320,
+      "totalFavorites": 48,
+      "totalComments": 210
+    },
+    "recentContents": [
+      {
+        "id": 101,
+        "type": "article",
+        "title": "微服务架构入门",
+        "status": "published",
+        "viewCount": 320,
+        "likeCount": 45,
+        "commentCount": 12,
+        "createdAt": "2024-01-02T10:00:00"
+      }
+    ],
+    "pendingItems": [
+      {
+        "type": "question",
+        "description": "问题《如何优化MySQL索引？》还没有回答",
+        "targetId": 88,
+        "createdAt": "2024-01-01T12:00:00"
+      }
+    ]
+  }
+}
+```
+
+#### 3.9.2 我的内容列表
+
+**接口：** `GET /dashboard/contents`
+
+**说明：** 分页查询当前用户的文章 / 问题 / 回答列表。
+
+**查询参数：**
+
+| 参数 | 说明 | 备注 |
+|------|------|------|
+| `type` | 内容类型：`articles` / `questions` / `answers` | 默认 `articles` |
+| `status` | 内容状态：文章 `draft/published/private`；问题 `pending/answered`；回答 `best` | 可选 |
+| `keyword` | 关键词搜索（标题 / 内容） | 可选 |
+| `page` | 页码 | 默认 1 |
+| `pageSize` | 每页条数 | 默认 20 |
+
+**响应：** 返回统一的分页结构，`items` 中的 `type`、`status` 字段描述内容类型及状态。
+
+#### 3.9.3 我的互动记录
+
+**接口：** `GET /dashboard/interactions`
+
+**说明：** 查看当前用户的互动行为记录。
+
+**查询参数：**
+
+| 参数 | 说明 |
+|------|------|
+| `type` | `likes`（点赞记录） / `favorites`（收藏记录） / `comments`（评论记录） / `answers`（回答记录） |
+| `page` / `pageSize` | 分页参数 |
+
+**响应：**
+
+```json
+{
+  "code": 200,
+  "data": {
+    "items": [
+      {
+        "type": "like",
+        "actionTime": "2024-01-02T09:00:00",
+        "targetType": "article",
+        "targetId": 101,
+        "targetTitle": "Spring Cloud 进阶",
+        "targetExcerpt": "……",
+        "targetOwnerName": "星尘",
+        "likeCount": 45,
+        "commentCount": 12
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "pageSize": 20,
+      "total": 35,
+      "totalPages": 2
+    }
+  }
+}
+```
+
+#### 3.9.4 数据趋势
+
+**接口：** `GET /dashboard/trends`
+
+**说明：** 返回近 7 天的内容发布趋势与粉丝增长趋势（仅统计当前用户的数据）。
+
+**响应：**
+
+```json
+{
+  "code": 200,
+  "data": {
+    "contentTrend": [
+      {"date": "2024-01-01", "value": 2},
+      {"date": "2024-01-02", "value": 0}
+    ],
+    "followerTrend": [
+      {"date": "2024-01-01", "value": 3},
+      {"date": "2024-01-02", "value": 1}
+    ]
+  }
+}
+```
+
+---
+
 ## 4. 第二阶段：视频功能 API
 
 > **说明：** 以下接口为第二阶段开发内容，当前阶段暂不实现。
