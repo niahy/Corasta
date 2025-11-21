@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.UUID;
 
 /**
@@ -25,10 +26,18 @@ public class FileStorageService {
     private final FileStorageProperties properties;
 
     private static final String AVATAR_PREFIX = "avatar";
+    private static final String ARTICLE_IMAGE_PREFIX = "article";
+    private static final long AVATAR_MAX_SIZE = 2 * 1024 * 1024L;
+    private static final long ARTICLE_IMAGE_MAX_SIZE = 5 * 1024 * 1024L;
 
     public String storeAvatar(Long userId, MultipartFile file) {
-        validateImage(file);
+        validateImage(file, AVATAR_MAX_SIZE, "png", "jpeg", "jpg");
         return store(file, properties.getAvatarDir(), AVATAR_PREFIX + "_" + userId);
+    }
+
+    public String storeArticleImage(Long userId, MultipartFile file) {
+        validateImage(file, ARTICLE_IMAGE_MAX_SIZE, "png", "jpeg", "jpg", "gif");
+        return store(file, properties.getArticleImageDir(), ARTICLE_IMAGE_PREFIX + "_" + userId);
     }
 
     private String store(MultipartFile file, String dir, String prefix) {
@@ -55,13 +64,18 @@ public class FileStorageService {
         }
     }
 
-    private void validateImage(MultipartFile file) {
-        String contentType = file.getContentType();
-        if (contentType == null || !(contentType.contains("png") || contentType.contains("jpeg") || contentType.contains("jpg"))) {
-            throw new ValidationException("仅支持 PNG/JPG 格式的图片");
+    private void validateImage(MultipartFile file, long maxSize, String... allowedContentTypes) {
+        if (file == null || file.isEmpty()) {
+            throw new ValidationException("请选择要上传的文件");
         }
-        if (file.getSize() > 2 * 1024 * 1024) {
-            throw new ValidationException("图片大小不能超过2MB");
+        String contentType = file.getContentType();
+        boolean allowed = contentType != null && Arrays.stream(allowedContentTypes)
+                .anyMatch(type -> contentType.toLowerCase().contains(type));
+        if (!allowed) {
+            throw new ValidationException("不支持的文件格式");
+        }
+        if (file.getSize() > maxSize) {
+            throw new ValidationException("文件大小超过限制");
         }
     }
 }
