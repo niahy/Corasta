@@ -188,9 +188,7 @@
 - **3.2 后端 (Spring Boot)**
   - **核心框架：** Spring Boot 3+
   - **数据库：** MySQL 8.0
-  - **持久层框架：** MyBatis-Plus 或 Spring Data JPA
-  - **安全框架：** Spring Security + JWT (用于无状态认证)
-  - **缓存：** Redis (用于缓存热点数据、Session管理等) 
+  - **持久层框架：**  Spring Data JPA 
   - **搜索引擎：** Elasticsearch 
   - **视频处理（这个先不做）：** FFmpeg (通过Java的 `ProcessBuilder` 调用)
   - **实时通信：** Spring WebSocket
