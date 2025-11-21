@@ -48,14 +48,28 @@ public class Result<T> {
      * 成功响应（有数据）
      */
     public static <T> Result<T> success(T data) {
-        return new Result<>(200, "操作成功", data, LocalDateTime.now());
+        return success("操作成功", data);
     }
     
     /**
      * 成功响应（自定义消息）
      */
     public static <T> Result<T> success(String message, T data) {
-        return new Result<>(200, message, data, LocalDateTime.now());
+        return of(200, message, data);
+    }
+    
+    /**
+     * 创建成功响应（201）
+     */
+    public static <T> Result<T> created(String message, T data) {
+        return of(201, message, data);
+    }
+    
+    /**
+     * 自定义响应
+     */
+    public static <T> Result<T> of(Integer code, String message, T data) {
+        return new Result<>(code, message, data, LocalDateTime.now());
     }
     
     /**
