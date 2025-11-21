@@ -1,7 +1,7 @@
 # 🌟 Corasta
 
 > **Coral（珊瑚） + Stardust（星尘）**  
-> 专为年轻人打造的青春浪漫、动漫般的罗曼蒂克恋爱风格社区平台
+> 专为年轻人打造的青春浪漫、动漫般的罗曼蒂克风格社区平台
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-brightgreen.svg)](https://spring.io/projects/spring-boot)
