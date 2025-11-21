@@ -194,7 +194,22 @@ CREATE TABLE IF NOT EXISTS `question_tags` (
     CONSTRAINT `fk_question_tags_tag_id` FOREIGN KEY (`tag_id`) REFERENCES `tags`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='问题标签关联表';
 
--- 2.7 回答表
+-- 2.7 问题关注表
+CREATE TABLE IF NOT EXISTS `question_follows` (
+    `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+    `question_id` BIGINT NOT NULL COMMENT '问题ID',
+    `user_id` BIGINT NOT NULL COMMENT '用户ID',
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_question_follow_user` (`question_id`, `user_id`),
+    INDEX `idx_question_follows_question_id` (`question_id`),
+    INDEX `idx_question_follows_user_id` (`user_id`),
+    CONSTRAINT `fk_question_follows_question_id` FOREIGN KEY (`question_id`) REFERENCES `questions`(`id`) ON DELETE CASCADE,
+    CONSTRAINT `fk_question_follows_user_id` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='问题关注表';
+
+-- 2.8 回答表
 CREATE TABLE IF NOT EXISTS `answers` (
     `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键ID',
     `question_id` BIGINT NOT NULL COMMENT '问题ID',
@@ -222,7 +237,7 @@ CREATE TABLE IF NOT EXISTS `answers` (
     CONSTRAINT `fk_answers_user_id` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='回答表';
 
--- 2.8 回答投票表
+-- 2.9 回答投票表
 CREATE TABLE IF NOT EXISTS `answer_votes` (
     `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键ID',
     `answer_id` BIGINT NOT NULL COMMENT '回答ID',
