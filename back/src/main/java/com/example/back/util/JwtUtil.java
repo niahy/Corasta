@@ -1,10 +1,3 @@
-    /**
-     * 生成Token
-     */
-    public String generateToken(Long userId, String username, Integer role) {
-        return generateToken(userId, username, role, false);
-    }
-    
 package com.example.back.util;
 
 import io.jsonwebtoken.Claims;
@@ -36,6 +29,13 @@ public class JwtUtil {
     
     @Value("${jwt.remember-me-expiration}")
     private Long rememberMeExpiration;
+
+    /**
+     * 生成Token
+     */
+    public String generateToken(Long userId, String username, Integer role) {
+        return generateToken(userId, username, role, false);
+    }
     
     /**
      * 生成Token（支持记住我）

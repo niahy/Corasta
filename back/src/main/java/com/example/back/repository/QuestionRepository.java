@@ -23,7 +23,7 @@ public interface QuestionRepository extends JpaRepository<Question, Long>, JpaSp
 
     List<Question> findTop5ByUser_IdOrderByCreatedAtDesc(Long userId);
 
-    List<Question> findTop5ByUser_IdAndAnswerCount(Long userId, Integer answerCount);
+    List<Question> findTop5ByUser_IdAndAnswerCountOrderByCreatedAtAsc(Long userId, Integer answerCount);
 
     @Query("select coalesce(sum(q.viewCount), 0) from Question q where q.user.id = :userId")
     long sumViewCountByUser(Long userId);
