@@ -17,6 +17,10 @@ import java.util.Optional;
  */
 public interface ArticleRepository extends JpaRepository<Article, Long>, JpaSpecificationExecutor<Article> {
 
+    @Override
+    @EntityGraph(attributePaths = {"user"})
+    List<Article> findAllById(Iterable<Long> ids);
+
     Optional<Article> findBySlug(String slug);
 
     @EntityGraph(attributePaths = {"user"})

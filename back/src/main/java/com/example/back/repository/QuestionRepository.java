@@ -16,6 +16,10 @@ import java.util.List;
  */
 public interface QuestionRepository extends JpaRepository<Question, Long>, JpaSpecificationExecutor<Question> {
 
+    @Override
+    @EntityGraph(attributePaths = {"user"})
+    List<Question> findAllById(Iterable<Long> ids);
+
     @EntityGraph(attributePaths = {"user"})
     Page<Question> findByUser_IdIn(List<Long> userIds, Pageable pageable);
 

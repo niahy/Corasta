@@ -3,6 +3,8 @@ package com.example.back.repository;
 import com.example.back.entity.Comment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
@@ -13,12 +15,22 @@ import java.util.List;
  */
 public interface CommentRepository extends JpaRepository<Comment, Long>, JpaSpecificationExecutor<Comment> {
 
+    @EntityGraph(attributePaths = {"user"})
     List<Comment> findByParentIdIn(List<Long> parentIds);
 
     Long countByParentId(Long parentId);
 
     List<Comment> findByTargetTypeAndTargetIdAndPinned(String targetType, Long targetId, Integer pinned);
 
+    @EntityGraph(attributePaths = {"user"})
     Page<Comment> findByUser_Id(Long userId, Pageable pageable);
+
+    @Override
+    @EntityGraph(attributePaths = {"user"})
+    Page<Comment> findAll(Specification<Comment> spec, Pageable pageable);
+
+    @Override
+    @EntityGraph(attributePaths = {"user"})
+    List<Comment> findAllById(Iterable<Long> ids);
 }
 

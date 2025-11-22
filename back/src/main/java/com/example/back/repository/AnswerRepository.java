@@ -4,6 +4,7 @@ import com.example.back.entity.Answer;
 import com.example.back.entity.Question;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -20,7 +21,12 @@ public interface AnswerRepository extends JpaRepository<Answer, Long>, JpaSpecif
 
     long countByUser_Id(Long userId);
 
+    @EntityGraph(attributePaths = {"user", "question", "question.user"})
     Page<Answer> findByUser_Id(Long userId, Pageable pageable);
+
+    @Override
+    @EntityGraph(attributePaths = {"user", "question", "question.user"})
+    List<Answer> findAllById(Iterable<Long> ids);
 
     List<Answer> findTop5ByUser_IdOrderByCreatedAtDesc(Long userId);
 
