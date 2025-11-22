@@ -539,3 +539,315 @@ CREATE TABLE IF NOT EXISTS `admin_operations` (
 -- 初始化完成
 -- =====================================================
 
+-- =====================================================
+-- 内置测试数据
+-- =====================================================
+
+-- 1. 用户数据
+INSERT INTO `users` (`id`, `username`, `password`, `nickname`, `avatar`, `bio`, `status`, `role`, `created_at`) VALUES
+(1, 'admin', 'admin123', '管理员', NULL, '系统管理员', 1, 1, NOW()),
+(2, 'alice', 'alice123', '星屿', 'https://via.placeholder.com/150', '热爱写作的文艺青年，喜欢记录生活中的美好瞬间', 1, 0, NOW()),
+(3, 'bob', 'bob123', 'Limer', 'https://via.placeholder.com/150', '技术爱好者，专注于前端开发', 1, 0, NOW()),
+(4, 'charlie', 'charlie123', '墨染', 'https://via.placeholder.com/150', '摄影爱好者，用镜头捕捉世界', 1, 0, NOW()),
+(5, 'diana', 'diana123', '清风', 'https://via.placeholder.com/150', '喜欢阅读和分享，追求内心的平静', 1, 0, NOW());
+
+-- 2. 用户隐私设置
+INSERT INTO `user_privacy_settings` (`user_id`, `homepage_visible`, `content_visible`) VALUES
+(1, 1, 1),
+(2, 1, 1),
+(3, 1, 1),
+(4, 1, 1),
+(5, 1, 1);
+
+-- 3. 分类数据
+INSERT INTO `categories` (`id`, `name`, `description`, `sort_order`) VALUES
+(1, '文学', '文学创作与阅读分享', 1),
+(2, '技术', '编程技术与开发经验', 2),
+(3, '生活', '日常生活与感悟', 3),
+(4, '摄影', '摄影作品与技巧分享', 4),
+(5, '旅行', '旅行见闻与攻略', 5);
+
+-- 4. 标签数据
+INSERT INTO `tags` (`id`, `name`, `description`, `use_count`) VALUES
+(1, 'Vue', 'Vue.js 前端框架', 5),
+(2, 'Spring Boot', 'Spring Boot 后端框架', 3),
+(3, '散文', '散文创作', 8),
+(4, '摄影技巧', '摄影技巧分享', 4),
+(5, '旅行攻略', '旅行攻略分享', 6),
+(6, '生活感悟', '生活感悟与思考', 10),
+(7, '前端开发', '前端开发技术', 7),
+(8, '后端开发', '后端开发技术', 5);
+
+-- 5. 文章数据
+INSERT INTO `articles` (`id`, `user_id`, `title`, `content`, `summary`, `cover_image`, `category_id`, `status`, `view_count`, `like_count`, `comment_count`, `favorite_count`, `published_at`, `created_at`) VALUES
+(1, 2, '如何写出带薄荷味的夏夜？', 
+'## 夏夜的记忆
+
+那个夏天，我坐在阳台上，看着夜空中的星星。微风轻拂，带来一丝凉意。
+
+### 薄荷的味道
+
+薄荷的清香，总是让我想起那个夏夜。那种清凉的感觉，仿佛能穿透时光，回到那个美好的夜晚。
+
+**写作的灵感**
+
+写作，就是要把这种感觉记录下来。用文字，把那些美好的瞬间，永远地保存下来。', 
+'用文字记录夏夜的美好，感受薄荷般的清凉', 
+'https://via.placeholder.com/800x400', 1, 1, 2300, 156, 23, 89, NOW() - INTERVAL 5 DAY, NOW() - INTERVAL 5 DAY),
+
+(2, 3, '粉色玻璃：青春故事里的五种光', 
+'## 青春的色彩
+
+青春，就像粉色玻璃一样，透明而美丽。透过它，我们看到了五种不同的光。
+
+### 第一种光：希望
+
+希望之光，总是那么明亮。它指引着我们前进的方向。
+
+### 第二种光：梦想
+
+梦想之光，虽然遥远，但总是那么吸引人。
+
+### 第三种光：友情
+
+友情之光，温暖而持久。
+
+### 第四种光：爱情
+
+爱情之光，绚烂而短暂。
+
+### 第五种光：成长
+
+成长之光，虽然痛苦，但最终会让我们变得更强大。', 
+'透过粉色玻璃，看青春的五种光', 
+'https://via.placeholder.com/800x400', 1, 1, 4600, 289, 45, 156, NOW() - INTERVAL 3 DAY, NOW() - INTERVAL 3 DAY),
+
+(3, 3, 'Vue 3 Composition API 实战指南', 
+'## 什么是 Composition API？
+
+Composition API 是 Vue 3 引入的新特性，它让我们能够更好地组织组件逻辑。
+
+### 基本用法
+
+```javascript
+import { ref, computed } from ''vue''
+
+export default {
+  setup() {
+    const count = ref(0)
+    const doubleCount = computed(() => count.value * 2)
+    
+    return {
+      count,
+      doubleCount
+    }
+  }
+}
+```
+
+### 优势
+
+1. 更好的逻辑复用
+2. 更清晰的代码组织
+3. 更好的 TypeScript 支持', 
+'深入理解 Vue 3 Composition API 的使用方法和优势', 
+'https://via.placeholder.com/800x400', 2, 1, 3200, 198, 34, 112, NOW() - INTERVAL 2 DAY, NOW() - INTERVAL 2 DAY),
+
+(4, 4, '城市夜景摄影技巧分享', 
+'## 夜景摄影的魅力
+
+城市夜景，总是那么迷人。如何在夜晚捕捉到最美的瞬间？
+
+### 设备准备
+
+1. 三脚架：必不可少
+2. 快门线：减少震动
+3. 广角镜头：捕捉更多画面
+
+### 拍摄技巧
+
+1. 使用小光圈（f/8-f/16）
+2. 低 ISO（100-400）
+3. 长曝光（5-30秒）
+
+### 后期处理
+
+适当的后期处理，能让照片更加出彩。', 
+'分享城市夜景摄影的技巧和经验', 
+'https://via.placeholder.com/800x400', 4, 1, 1800, 124, 18, 67, NOW() - INTERVAL 1 DAY, NOW() - INTERVAL 1 DAY),
+
+(5, 5, '生活中的小确幸', 
+'## 什么是小确幸？
+
+小确幸，就是生活中那些微小而确实的幸福。
+
+### 早晨的阳光
+
+每天早晨，当阳光透过窗户洒进来，那种温暖的感觉，就是小确幸。
+
+### 一杯热茶
+
+在寒冷的冬天，一杯热茶，能带来满满的幸福感。
+
+### 朋友的问候
+
+朋友的问候，虽然简单，但总是那么温暖。
+
+**珍惜当下**
+
+让我们珍惜生活中的每一个小确幸。', 
+'记录生活中的小确幸，感受生活的美好', 
+'https://via.placeholder.com/800x400', 3, 1, 1500, 98, 15, 45, NOW() - INTERVAL 1 DAY, NOW() - INTERVAL 1 DAY);
+
+-- 6. 文章标签关联
+INSERT INTO `article_tags` (`article_id`, `tag_id`) VALUES
+(1, 3), (1, 6),
+(2, 3), (2, 6),
+(3, 1), (3, 7),
+(4, 4),
+(5, 6);
+
+-- 7. 问题数据
+INSERT INTO `questions` (`id`, `user_id`, `title`, `description`, `view_count`, `answer_count`, `follow_count`, `status`, `created_at`) VALUES
+(1, 3, 'Vue 3 和 Vue 2 的主要区别是什么？', 
+'最近在学习 Vue 3，想了解一下 Vue 3 和 Vue 2 的主要区别。特别是 Composition API 的使用场景。', 
+1200, 3, 15, 1, NOW() - INTERVAL 4 DAY),
+
+(2, 4, '如何拍摄出有质感的夜景照片？', 
+'我刚开始学习摄影，想拍出有质感的夜景照片。请问有什么技巧和注意事项？', 
+800, 2, 8, 1, NOW() - INTERVAL 2 DAY),
+
+(3, 5, '如何保持生活的热情？', 
+'最近感觉生活有些乏味，想知道如何保持对生活的热情和好奇心。', 
+600, 1, 5, 1, NOW() - INTERVAL 1 DAY);
+
+-- 8. 问题标签关联
+INSERT INTO `question_tags` (`question_id`, `tag_id`) VALUES
+(1, 1), (1, 7),
+(2, 4),
+(3, 6);
+
+-- 9. 回答数据
+INSERT INTO `answers` (`id`, `question_id`, `user_id`, `content`, `upvote_count`, `downvote_count`, `comment_count`, `is_best`, `status`, `created_at`) VALUES
+(1, 1, 2, 
+'Vue 3 相比 Vue 2 的主要改进包括：
+
+1. **性能提升**：更快的渲染速度和更小的包体积
+2. **Composition API**：更好的逻辑复用和代码组织
+3. **TypeScript 支持**：更好的类型推断
+4. **新的响应式系统**：基于 Proxy 的实现
+
+Composition API 特别适合：
+- 大型组件
+- 需要逻辑复用的场景
+- TypeScript 项目', 
+45, 2, 5, 1, 1, NOW() - INTERVAL 3 DAY),
+
+(2, 1, 3, 
+'补充一点：Vue 3 还引入了 Teleport、Suspense 等新特性，这些在 Vue 2 中是没有的。', 
+12, 0, 1, 0, 1, NOW() - INTERVAL 2 DAY),
+
+(3, 2, 4, 
+'拍摄夜景的关键点：
+
+1. **稳定设备**：使用三脚架
+2. **正确曝光**：使用手动模式，控制光圈和快门
+3. **低 ISO**：保持画面清晰
+4. **构图**：注意前景和背景的搭配', 
+28, 1, 3, 1, 1, NOW() - INTERVAL 1 DAY),
+
+(4, 3, 5, 
+'保持生活热情的方法：
+
+1. 培养新的兴趣爱好
+2. 定期给自己设定小目标
+3. 多和朋友交流
+4. 记录生活中的美好瞬间', 
+15, 0, 2, 0, 1, NOW() - INTERVAL 1 DAY);
+
+-- 10. 更新问题的最佳回答
+UPDATE `questions` SET `best_answer_id` = 1 WHERE `id` = 1;
+UPDATE `questions` SET `best_answer_id` = 3 WHERE `id` = 2;
+
+-- 11. 评论数据
+INSERT INTO `comments` (`id`, `target_type`, `target_id`, `user_id`, `parent_id`, `content`, `like_count`, `reply_count`, `status`, `created_at`) VALUES
+(1, 'article', 1, 3, NULL, '写得真好，让我想起了自己的夏夜记忆', 12, 2, 1, NOW() - INTERVAL 4 DAY),
+(2, 'article', 1, 4, 1, '同感！薄荷的味道确实很特别', 5, 0, 1, NOW() - INTERVAL 3 DAY),
+(3, 'article', 2, 2, NULL, '青春的五种光，写得太美了', 18, 1, 1, NOW() - INTERVAL 2 DAY),
+(4, 'article', 3, 2, NULL, 'Composition API 确实很好用，感谢分享', 8, 0, 1, NOW() - INTERVAL 1 DAY),
+(5, 'answer', 1, 4, NULL, '总结得很全面，学到了', 6, 0, 1, NOW() - INTERVAL 2 DAY);
+
+-- 12. 点赞数据
+INSERT INTO `likes` (`target_type`, `target_id`, `user_id`, `created_at`) VALUES
+('article', 1, 3, NOW() - INTERVAL 4 DAY),
+('article', 1, 4, NOW() - INTERVAL 3 DAY),
+('article', 2, 2, NOW() - INTERVAL 2 DAY),
+('article', 2, 3, NOW() - INTERVAL 2 DAY),
+('article', 3, 2, NOW() - INTERVAL 1 DAY),
+('article', 3, 4, NOW() - INTERVAL 1 DAY),
+('answer', 1, 3, NOW() - INTERVAL 2 DAY),
+('answer', 1, 4, NOW() - INTERVAL 2 DAY),
+('comment', 1, 2, NOW() - INTERVAL 3 DAY),
+('comment', 3, 3, NOW() - INTERVAL 1 DAY);
+
+-- 13. 收藏夹数据
+INSERT INTO `favorite_folders` (`id`, `user_id`, `name`, `description`, `sort_order`) VALUES
+(1, 2, '技术文章', '收藏的技术相关文章', 1),
+(2, 2, '文学创作', '喜欢的文学作品', 2),
+(3, 3, '前端开发', '前端开发相关资源', 1),
+(4, 4, '摄影技巧', '摄影技巧和教程', 1);
+
+-- 14. 收藏数据
+INSERT INTO `favorites` (`target_type`, `target_id`, `user_id`, `folder_id`, `created_at`) VALUES
+('article', 1, 2, 2, NOW() - INTERVAL 4 DAY),
+('article', 2, 2, 2, NOW() - INTERVAL 2 DAY),
+('article', 3, 3, 3, NOW() - INTERVAL 1 DAY),
+('article', 4, 4, 4, NOW() - INTERVAL 1 DAY);
+
+-- 15. 关注数据
+INSERT INTO `follows` (`follower_id`, `following_id`, `created_at`) VALUES
+(2, 3, NOW() - INTERVAL 10 DAY),
+(3, 2, NOW() - INTERVAL 8 DAY),
+(4, 2, NOW() - INTERVAL 5 DAY),
+(5, 2, NOW() - INTERVAL 3 DAY),
+(2, 4, NOW() - INTERVAL 2 DAY);
+
+-- 16. 问题关注数据
+INSERT INTO `question_follows` (`question_id`, `user_id`, `created_at`) VALUES
+(1, 2, NOW() - INTERVAL 3 DAY),
+(1, 4, NOW() - INTERVAL 2 DAY),
+(2, 3, NOW() - INTERVAL 1 DAY);
+
+-- 17. 回答投票数据
+INSERT INTO `answer_votes` (`answer_id`, `user_id`, `vote_type`, `created_at`) VALUES
+(1, 3, 1, NOW() - INTERVAL 2 DAY),
+(1, 4, 1, NOW() - INTERVAL 2 DAY),
+(1, 5, 1, NOW() - INTERVAL 1 DAY),
+(2, 2, 1, NOW() - INTERVAL 1 DAY),
+(3, 2, 1, NOW() - INTERVAL 1 DAY),
+(3, 3, 1, NOW() - INTERVAL 1 DAY);
+
+-- 18. 通知数据
+INSERT INTO `notifications` (`user_id`, `type`, `title`, `content`, `target_type`, `target_id`, `sender_id`, `is_read`, `created_at`) VALUES
+(2, 'comment', '新评论', 'alice 评论了你的文章《如何写出带薄荷味的夏夜？》', 'article', 1, 3, 0, NOW() - INTERVAL 4 DAY),
+(2, 'like', '新点赞', 'bob 点赞了你的文章《如何写出带薄荷味的夏夜？》', 'article', 1, 3, 0, NOW() - INTERVAL 3 DAY),
+(3, 'comment', '新评论', 'alice 评论了你的文章《粉色玻璃：青春故事里的五种光》', 'article', 2, 2, 1, NOW() - INTERVAL 2 DAY),
+(3, 'follow', '新关注', 'charlie 关注了你', 'user', 3, 4, 0, NOW() - INTERVAL 2 DAY),
+(1, 'answer', '新回答', 'alice 回答了你的问题《Vue 3 和 Vue 2 的主要区别是什么？》', 'question', 1, 2, 0, NOW() - INTERVAL 3 DAY);
+
+-- 19. 搜索日志数据（用于测试搜索建议功能）
+INSERT INTO `search_logs` (`user_id`, `keyword`, `result_count`, `search_type`, `created_at`) VALUES
+(2, 'Vue', 5, 'all', NOW() - INTERVAL 10 DAY),
+(3, 'Vue 3', 3, 'article', NOW() - INTERVAL 8 DAY),
+(2, '摄影', 4, 'all', NOW() - INTERVAL 7 DAY),
+(4, '摄影技巧', 2, 'article', NOW() - INTERVAL 6 DAY),
+(3, '前端开发', 7, 'all', NOW() - INTERVAL 5 DAY),
+(2, '生活', 6, 'article', NOW() - INTERVAL 4 DAY),
+(5, '生活感悟', 3, 'article', NOW() - INTERVAL 3 DAY),
+(2, 'Vue', 5, 'all', NOW() - INTERVAL 2 DAY),
+(3, 'Vue 3', 3, 'article', NOW() - INTERVAL 1 DAY),
+(4, '摄影', 4, 'all', NOW() - INTERVAL 1 DAY);
+
+-- =====================================================
+-- 测试数据初始化完成
+-- =====================================================
