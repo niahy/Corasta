@@ -1,5 +1,5 @@
 <template>
-  <div
+  <div 
     :class="['avatar', `avatar-${size}`, { 'avatar-clickable': clickable }]"
     :style="avatarStyle"
     @click="handleClick"
@@ -9,6 +9,7 @@
     <span v-if="online" class="avatar-online"></span>
   </div>
 </template>
+
 
 <script setup>
 import { computed, defineProps, defineEmits } from 'vue';
