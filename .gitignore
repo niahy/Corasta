@@ -11,3 +11,5 @@ docs/
 front/代码检查报告.md
 front/开发规范.md
 
+#后端配置类
+back/src/main/resources/application.properties
