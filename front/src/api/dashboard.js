@@ -5,11 +5,11 @@
 import request from '@/utils/request'
 
 /**
- * 获取仪表盘概览
+ * 获取内容管理仪表盘
  * @returns {Promise}
  */
-export function getDashboardOverview() {
-  return request.get('/dashboard/overview')
+export function getDashboardContent() {
+  return request.get('/dashboard/content')
 }
 
 /**
@@ -31,11 +31,11 @@ export function getMyInteractions(params) {
 }
 
 /**
- * 获取数据趋势
- * @param {object} params - 查询参数
+ * 获取数据分析仪表盘
+ * @param {object} params - 查询参数 {startDate, endDate}
  * @returns {Promise}
  */
-export function getTrends(params) {
-  return request.get('/dashboard/trends', { params })
+export function getDashboardAnalytics(params) {
+  return request.get('/dashboard/analytics', { params })
 }
 
