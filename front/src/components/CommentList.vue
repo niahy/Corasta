@@ -1,6 +1,6 @@
 <template>
   <div class="comment-list">
-    <!-- 评论输入框 -->
+    <!-- 评论输入框（仅用于发布新评论，不用于回复） -->
     <div v-if="showInput" class="comment-input-section">
       <Card>
         <div class="comment-input-header">
@@ -10,28 +10,20 @@
             size="small"
           />
           <span class="comment-input-hint">
-            {{ replyingTo ? `回复 @${replyingTo.author.nickname}` : '写下你的评论...' }}
+            写下你的评论...
           </span>
         </div>
         <div class="comment-input-body">
           <textarea
             v-model="commentContent"
             class="comment-textarea"
-            :placeholder="replyingTo ? `回复 @${replyingTo.author.nickname}：` : '支持 Markdown 语法，最多 1000 字符'"
+            placeholder="支持 Markdown 语法，最多 1000 字符"
             :maxlength="1000"
             rows="4"
           ></textarea>
           <div class="comment-input-footer">
             <span class="comment-char-count">{{ commentContent.length }}/1000</span>
             <div class="comment-input-actions">
-              <Button
-                v-if="replyingTo"
-                variant="text"
-                size="small"
-                @click="cancelReply"
-              >
-                取消
-              </Button>
               <Button
                 variant="primary"
                 size="small"
@@ -76,6 +68,7 @@
         :target-type="targetType"
         :target-id="targetId"
         :is-author="isAuthor"
+        :depth="0"
         @reply="handleReply"
         @like="handleCommentLike"
         @delete="handleDelete"
@@ -137,7 +130,6 @@ const sortOptions = [
 const currentSort = ref('latest')
 const comments = ref([])
 const commentContent = ref('')
-const replyingTo = ref(null)
 const submitting = ref(false)
 const loading = ref(false)
 const loadingMore = ref(false)
@@ -214,7 +206,7 @@ function resetAndFetch() {
   fetchComments()
 }
 
-// 提交评论
+// 提交评论（仅用于发布新评论，不用于回复）
 async function handleSubmit() {
   if (!userStore.isLoggedIn) {
     alert('请先登录')
@@ -228,16 +220,16 @@ async function handleSubmit() {
 
   submitting.value = true
   try {
+    // 发布新评论，parentId 为 null
     const response = await createComment({
       targetType: props.targetType,
       targetId: props.targetId,
       content: commentContent.value.trim(),
-      parentId: replyingTo.value?.id || null,
+      parentId: null,
     })
 
     if (response.data) {
       commentContent.value = ''
-      replyingTo.value = null
       // 刷新评论列表
       resetAndFetch()
       emit('comment-added', response.data)
@@ -250,25 +242,14 @@ async function handleSubmit() {
   }
 }
 
-// 回复评论
+// 回复评论（由 CommentItem 触发，用于刷新列表）
 function handleReply(comment) {
-  replyingTo.value = comment
-  // 滚动到输入框
-  setTimeout(() => {
-    const inputSection = document.querySelector('.comment-input-section')
-    if (inputSection) {
-      inputSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-    }
-  }, 100)
-}
-
-// 取消回复
-function cancelReply() {
-  replyingTo.value = null
+  // 刷新评论列表以显示新回复
+  resetAndFetch()
 }
 
 // 点赞评论
-async function handleCommentLike(comment) {
+async function handleCommentLike(commentId) {
   // CommentItem 组件内部处理，这里只需要刷新列表
   resetAndFetch()
 }
@@ -422,7 +403,7 @@ onMounted(() => {
 .comments {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 0;
 }
 
 .load-more {

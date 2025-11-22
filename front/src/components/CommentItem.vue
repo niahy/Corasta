@@ -1,59 +1,66 @@
 <template>
-  <div :class="['comment-item', { 'comment-item-pinned': comment.isPinned }]">
-    <Card>
-      <div class="comment-header">
-        <div class="comment-author">
-          <Avatar
-            :src="comment.author.avatar"
-            :name="comment.author.nickname"
-            size="small"
-          />
+  <div 
+    :class="['comment-item', { 
+      'comment-item-pinned': comment.isPinned, 
+      'comment-item-reply': isReply,
+      'comment-item-depth-1': depth === 1,
+      'comment-item-depth-2': depth === 2,
+      'comment-item-depth-max': depth >= 3
+    }]"
+    ref="commentItemRef"
+  >
+    <div class="comment-main">
+      <div class="comment-avatar">
+        <Avatar
+          :src="comment.author.avatar"
+          :name="comment.author.nickname"
+          size="small"
+        />
+      </div>
+      <div class="comment-body">
+        <div class="comment-header">
           <div class="comment-author-info">
             <span class="comment-author-name">{{ comment.author.nickname }}</span>
             <span v-if="comment.isPinned" class="comment-pinned-badge">置顶</span>
+            <span class="comment-time">{{ formatRelativeTime(comment.createdAt) }}</span>
+            <span v-if="comment.updatedAt !== comment.createdAt" class="comment-edited">
+              （已编辑）
+            </span>
           </div>
         </div>
-        <div class="comment-meta">
-          <span class="comment-time">{{ formatRelativeTime(comment.createdAt) }}</span>
-          <span v-if="comment.updatedAt !== comment.createdAt" class="comment-edited">
-            （已编辑）
-          </span>
-        </div>
-      </div>
 
-      <div class="comment-content">
-        <div
-          v-if="!isEditing"
-          class="comment-text"
-          v-html="renderedContent"
-        ></div>
-        <div v-else class="comment-edit">
-          <textarea
-            v-model="editContent"
-            class="comment-edit-textarea"
-            :maxlength="1000"
-            rows="3"
-          ></textarea>
-          <div class="comment-edit-actions">
-            <Button variant="text" size="small" @click="cancelEdit">取消</Button>
-            <Button variant="primary" size="small" :loading="updating" @click="saveEdit">
-              保存
-            </Button>
+        <div class="comment-content">
+          <div
+            v-if="!isEditing"
+            class="comment-text"
+            v-html="renderedContent"
+          ></div>
+          <div v-else class="comment-edit">
+            <textarea
+              v-model="editContent"
+              class="comment-edit-textarea"
+              :maxlength="1000"
+              rows="3"
+            ></textarea>
+            <div class="comment-edit-actions">
+              <Button variant="text" size="small" @click="cancelEdit">取消</Button>
+              <Button variant="primary" size="small" :loading="updating" @click="saveEdit">
+                保存
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="comment-footer">
         <div class="comment-actions">
           <button
             :class="['comment-action-btn', { active: comment.isLiked }]"
             @click="handleLike"
             :disabled="likeLoading"
           >
-            <span class="action-icon">❤️</span>
+            <span class="action-icon">👍</span>
             <span>{{ comment.likeCount || 0 }}</span>
           </button>
-          <button class="comment-action-btn" @click="handleReplyClick">
+          <button class="comment-action-btn" @click="toggleReplyInput">
             <span class="action-icon">💬</span>
             <span>回复</span>
           </button>
@@ -80,43 +87,90 @@
             {{ comment.isPinned ? '取消置顶' : '置顶' }}
           </button>
         </div>
-      </div>
 
-      <!-- 二级评论（回复） -->
-      <div v-if="comment.replies && comment.replies.length > 0" class="comment-replies">
-        <div class="replies-header">
-          <span class="replies-count">{{ comment.replyCount }} 条回复</span>
-          <button
-            class="replies-toggle"
-            @click="showReplies = !showReplies"
-          >
-            {{ showReplies ? '收起' : '展开' }}
-          </button>
+        <!-- 回复输入框（在评论下方） -->
+        <div v-if="showReplyInput" class="reply-input-container" @click.stop>
+          <div class="reply-input-header">
+            <Avatar
+              :src="userStore.userInfo?.avatar"
+              :name="userStore.userInfo?.nickname"
+              size="small"
+            />
+            <span class="reply-input-hint">
+              回复 @{{ comment.author.nickname }}
+            </span>
+          </div>
+          <div class="reply-input-body">
+            <textarea
+              v-model="replyContent"
+              class="reply-textarea"
+              :placeholder="`回复 @${comment.author.nickname}：`"
+              :maxlength="1000"
+              rows="3"
+              ref="replyTextareaRef"
+            ></textarea>
+            <div class="reply-input-footer">
+              <span class="reply-char-count">{{ replyContent.length }}/1000</span>
+              <div class="reply-input-actions">
+                <Button
+                  variant="text"
+                  size="small"
+                  @click="cancelReplyInput"
+                >
+                  取消
+                </Button>
+                <Button
+                  variant="primary"
+                  size="small"
+                  :loading="submitting"
+                  :disabled="!replyContent.trim()"
+                  @click="handleSubmitReply"
+                >
+                  发布
+                </Button>
+              </div>
+            </div>
+          </div>
         </div>
-        <div v-if="showReplies" class="replies-list">
-          <CommentItem
-            v-for="reply in comment.replies"
-            :key="reply.id"
-            :comment="reply"
-            :target-type="targetType"
-            :target-id="targetId"
-            :is-author="isAuthor"
-            @reply="handleReply"
-            @like="handleLike"
-            @delete="handleDelete"
-            @edit="handleEdit"
-            @pin="handlePin"
-          />
+
+        <!-- 回复列表（支持多级嵌套） -->
+        <div v-if="comment.replies && comment.replies.length > 0" class="comment-replies">
+          <div class="replies-header">
+            <span class="replies-count">{{ comment.replyCount }} 条回复</span>
+            <button
+              class="replies-toggle"
+              @click="showReplies = !showReplies"
+            >
+              {{ showReplies ? '收起' : '展开' }}
+            </button>
+          </div>
+          <div v-if="showReplies" class="replies-list">
+            <CommentItem
+              v-for="reply in comment.replies"
+              :key="reply.id"
+              :comment="reply"
+              :target-type="targetType"
+              :target-id="targetId"
+              :is-author="isAuthor"
+              :is-reply="true"
+              :depth="depth + 1"
+              @reply="handleReplyFromChild"
+              @like="handleLike"
+              @delete="handleDelete"
+              @edit="handleEdit"
+              @pin="handlePin"
+            />
+          </div>
         </div>
       </div>
-    </Card>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
 import { useUserStore } from '@/stores/user'
-import { updateComment, deleteComment, likeComment, unlikeComment, pinComment } from '@/api/comment'
+import { updateComment, deleteComment, likeComment, unlikeComment, pinComment, createComment } from '@/api/comment'
 import { formatRelativeTime } from '@/utils/format'
 import Card from './Card.vue'
 import Button from './Button.vue'
@@ -139,6 +193,14 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  isReply: {
+    type: Boolean,
+    default: false,
+  },
+  depth: {
+    type: Number,
+    default: 0,
+  },
 })
 
 const emit = defineEmits(['reply', 'like', 'delete', 'edit', 'pin'])
@@ -151,6 +213,11 @@ const updating = ref(false)
 const likeLoading = ref(false)
 const pinLoading = ref(false)
 const showReplies = ref(true)
+const showReplyInput = ref(false)
+const replyContent = ref('')
+const submitting = ref(false)
+const replyTextareaRef = ref(null)
+const commentItemRef = ref(null)
 
 // 权限判断
 const canEdit = computed(() => {
@@ -259,10 +326,100 @@ async function handleLike() {
   }
 }
 
-// 回复
-function handleReplyClick() {
-  emit('reply', props.comment)
+// 切换回复输入框
+function toggleReplyInput() {
+  if (!userStore.isLoggedIn) {
+    alert('请先登录')
+    return
+  }
+  showReplyInput.value = !showReplyInput.value
+  if (showReplyInput.value) {
+    nextTick(() => {
+      replyTextareaRef.value?.focus()
+    })
+  } else {
+    replyContent.value = ''
+  }
 }
+
+// 取消回复输入
+function cancelReplyInput() {
+  showReplyInput.value = false
+  replyContent.value = ''
+}
+
+// 提交回复
+async function handleSubmitReply() {
+  if (!userStore.isLoggedIn) {
+    alert('请先登录')
+    return
+  }
+
+  if (!replyContent.value.trim()) {
+    alert('请输入回复内容')
+    return
+  }
+
+  submitting.value = true
+  try {
+    // 关键：使用当前评论的 ID 作为 parentId
+    // 无论当前评论是顶级评论还是回复，都使用它的 ID
+    // 这样当C回复B时，B的ID会作为parentId传递，确保C的回复是回复B的，而不是对文章的评论
+    const response = await createComment({
+      targetType: props.targetType,
+      targetId: props.targetId,
+      content: replyContent.value.trim(),
+      parentId: props.comment.id, // 使用当前评论/回复的 ID 作为 parentId
+    })
+
+    if (response.data) {
+      replyContent.value = ''
+      showReplyInput.value = false
+      // 通知父组件刷新评论列表
+      emit('reply', props.comment)
+    }
+  } catch (error) {
+    console.error('发布回复失败:', error)
+    alert(error.message || '发布回复失败，请重试')
+  } finally {
+    submitting.value = false
+  }
+}
+
+// 处理子组件的回复事件（用于刷新回复列表）
+function handleReplyFromChild(comment) {
+  emit('reply', comment)
+}
+
+// 点击外部关闭回复输入框
+function handleClickOutside(event) {
+  if (!showReplyInput.value) {
+    return
+  }
+  
+  // 如果点击的是回复输入框内部，不关闭
+  if (event.target.closest('.reply-input-container')) {
+    return
+  }
+  
+  // 如果点击的是当前评论项的其他部分，也不关闭（允许用户点击评论内容等）
+  if (commentItemRef.value && commentItemRef.value.contains(event.target)) {
+    // 但如果点击的是回复按钮，会切换状态，这里不处理
+    return
+  }
+  
+  // 点击页面其他地方，关闭输入框
+  showReplyInput.value = false
+  replyContent.value = ''
+}
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
+})
 
 // 删除
 async function handleDeleteClick() {
@@ -303,29 +460,71 @@ async function handlePinClick() {
 <style scoped>
 .comment-item {
   width: 100%;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.comment-item:last-child {
+  border-bottom: none;
 }
 
 .comment-item-pinned {
+  background: rgba(255, 107, 107, 0.05);
+  padding: 12px;
+  border-radius: var(--radius-sm);
   border-left: 3px solid var(--coral-pink);
 }
 
-.comment-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
+.comment-item-reply {
+  padding: 8px 0;
 }
 
-.comment-author {
+/* depth=0: 一级评论（parentId: null），不缩进 */
+
+/* depth=1: 二级评论（B回复A），缩进1级 - 16px */
+.comment-item-depth-1 {
+  transform: translateX(16px);
+  padding-left: 16px;
+  border-left: 2px solid var(--border);
+}
+
+/* depth=2: 三级评论（C回复B），缩进2级 - 32px */
+.comment-item-depth-2 {
+  transform: translateX(32px);
+  padding-left: 16px;
+  border-left: 2px solid var(--border);
+}
+
+/* depth>=3: 四级及以后（D回复C、E回复D等），保持缩进2级 - 32px，不再增加 */
+.comment-item-depth-max {
+  transform: translateX(32px);
+  padding-left: 16px;
+  border-left: 2px solid var(--border);
+}
+
+.comment-main {
   display: flex;
-  align-items: center;
-  gap: 10px;
+  gap: 12px;
+}
+
+.comment-avatar {
+  flex-shrink: 0;
+}
+
+.comment-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.comment-header {
+  margin-bottom: 6px;
 }
 
 .comment-author-info {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
 .comment-author-name {
@@ -335,17 +534,14 @@ async function handlePinClick() {
 }
 
 .comment-pinned-badge {
-  font-size: 12px;
+  font-size: 11px;
   padding: 2px 6px;
   background: var(--coral-pink);
   color: white;
   border-radius: 4px;
 }
 
-.comment-meta {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.comment-time {
   font-size: 12px;
   color: var(--text-dark);
   opacity: 0.6;
@@ -358,13 +554,15 @@ async function handlePinClick() {
 }
 
 .comment-content {
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .comment-text {
-  font-size: 15px;
+  font-size: 14px;
   line-height: 1.6;
   color: var(--text-dark);
+  word-wrap: break-word;
+  word-break: break-word;
 }
 
 .comment-text :deep(strong) {
@@ -381,7 +579,7 @@ async function handlePinClick() {
   padding: 2px 6px;
   border-radius: 4px;
   font-family: 'Courier New', monospace;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .comment-text :deep(a) {
@@ -423,14 +621,10 @@ async function handlePinClick() {
   gap: 8px;
 }
 
-.comment-footer {
-  padding-top: 12px;
-  border-top: 1px solid var(--border);
-}
-
 .comment-actions {
   display: flex;
   gap: 16px;
+  margin-top: 4px;
 }
 
 .comment-action-btn {
@@ -445,11 +639,13 @@ async function handlePinClick() {
   opacity: 0.7;
   cursor: pointer;
   transition: all 0.2s;
+  border-radius: 4px;
 }
 
 .comment-action-btn:hover {
   opacity: 1;
   color: var(--coral-pink);
+  background: rgba(255, 107, 107, 0.1);
 }
 
 .comment-action-btn.active {
@@ -459,6 +655,7 @@ async function handlePinClick() {
 
 .comment-action-btn.danger:hover {
   color: #ff4757;
+  background: rgba(255, 71, 87, 0.1);
 }
 
 .comment-action-btn:disabled {
@@ -471,37 +668,109 @@ async function handlePinClick() {
 }
 
 .comment-replies {
-  margin-top: 16px;
-  padding-left: 20px;
-  border-left: 2px solid var(--border);
+  margin-top: 12px;
+  /* 确保回复列表容器不添加额外缩进 */
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+  transform: none !important;
 }
 
 .replies-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .replies-count {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--text-dark);
   opacity: 0.7;
 }
 
 .replies-toggle {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--coral-pink);
   background: transparent;
   border: none;
   cursor: pointer;
   padding: 0;
+  transition: opacity 0.2s;
+}
+
+.replies-toggle:hover {
+  opacity: 0.8;
 }
 
 .replies-list {
   display: flex;
   flex-direction: column;
+  gap: 0;
+  /* 确保回复列表不添加额外缩进 */
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+}
+
+.reply-input-container {
+  margin-top: 12px;
+  padding: 12px;
+  background: var(--bg-light);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+
+.reply-input-header {
+  display: flex;
+  align-items: center;
   gap: 12px;
+  margin-bottom: 12px;
+}
+
+.reply-input-hint {
+  font-size: 13px;
+  color: var(--text-dark);
+  opacity: 0.7;
+}
+
+.reply-input-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.reply-textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-family: inherit;
+  line-height: 1.6;
+  color: var(--text-dark);
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.reply-textarea:focus {
+  border-color: var(--coral-pink);
+}
+
+.reply-input-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.reply-char-count {
+  font-size: 12px;
+  color: var(--text-dark);
+  opacity: 0.6;
+}
+
+.reply-input-actions {
+  display: flex;
+  gap: 8px;
 }
 </style>
 

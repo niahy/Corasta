@@ -89,11 +89,12 @@ public class CommentServiceImpl implements CommentService {
         Page<Comment> page = commentRepository.findAll(specification, pageable);
 
         List<Long> commentIds = page.stream().map(Comment::getId).toList();
-        List<Comment> replies = loadReplies(commentIds);
+        // 递归加载所有嵌套回复
+        List<Comment> allReplies = loadAllReplies(commentIds);
         List<Long> allIds = new ArrayList<>(commentIds);
-        allIds.addAll(replies.stream().map(Comment::getId).toList());
+        allIds.addAll(allReplies.stream().map(Comment::getId).toList());
         Map<Long, Boolean> likedMap = loadLikedMap(allIds);
-        Map<Long, List<Comment>> replyMap = replies.stream()
+        Map<Long, List<Comment>> replyMap = allReplies.stream()
                 .sorted(Comparator.comparing(Comment::getCreatedAt))
                 .collect(Collectors.groupingBy(comment -> comment.getParent().getId()));
 
@@ -193,11 +194,30 @@ public class CommentServiceImpl implements CommentService {
                 .collect(Collectors.toMap(Like::getTargetId, like -> true));
     }
 
-    private List<Comment> loadReplies(List<Long> parentIds) {
+    /**
+     * 递归加载所有嵌套回复（最多支持5层嵌套）
+     */
+    private List<Comment> loadAllReplies(List<Long> parentIds) {
         if (parentIds.isEmpty()) {
             return Collections.emptyList();
         }
-        return commentRepository.findByParentIdIn(parentIds);
+        List<Comment> allReplies = new ArrayList<>();
+        List<Long> currentLevelIds = new ArrayList<>(parentIds);
+        int maxDepth = 5; // 限制最大嵌套深度
+        
+        for (int depth = 0; depth < maxDepth && !currentLevelIds.isEmpty(); depth++) {
+            List<Comment> currentLevelReplies = commentRepository.findByParentIdIn(currentLevelIds);
+            if (currentLevelReplies.isEmpty()) {
+                break;
+            }
+            allReplies.addAll(currentLevelReplies);
+            // 准备下一层的 parentIds
+            currentLevelIds = currentLevelReplies.stream()
+                    .map(Comment::getId)
+                    .toList();
+        }
+        
+        return allReplies;
     }
 
     private CommentListItemResponse toCommentListItem(Comment comment,
