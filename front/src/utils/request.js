@@ -49,7 +49,7 @@ request.interceptors.response.use(
           // 未授权，清除 token 并跳转登录
           localStorage.removeItem('token')
           localStorage.removeItem('user')
-          window.location.href = '/auth/login'
+          window.location.href = '/login'
           break
         case 403:
           return Promise.reject(new Error('无权限访问'))
