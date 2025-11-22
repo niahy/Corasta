@@ -16,16 +16,6 @@
               <Button variant="primary" size="large" to="/feed">探索内容</Button>
               <Button variant="outline" size="large" to="/auth/register">立即加入</Button>
             </div>
-            <div class="stats-bar">
-              <div class="stat-item">
-                <div class="stat-label">创作者</div>
-                <div class="stat-value">1280</div>
-              </div>
-              <div class="stat-item">
-                <div class="stat-label">互动数</div>
-                <div class="stat-value">84.2k</div>
-              </div>
-            </div>
           </div>
         </section>
       </div>
@@ -105,30 +95,6 @@ const isLoggedIn = computed(() => userStore.isLoggedIn)
   display: flex;
   gap: 16px;
   justify-content: center;
-  margin-bottom: 60px;
-}
-
-.stats-bar {
-  display: flex;
-  gap: 40px;
-  justify-content: center;
-}
-
-.stat-item {
-  text-align: center;
-}
-
-.stat-label {
-  font-size: 14px;
-  color: var(--text-dark);
-  opacity: 0.7;
-  margin-bottom: 8px;
-}
-
-.stat-value {
-  font-size: 32px;
-  font-weight: 700;
-  color: var(--coral-pink);
 }
 
 @media (max-width: 768px) {
@@ -143,11 +109,6 @@ const isLoggedIn = computed(() => userStore.isLoggedIn)
   .hero-actions {
     flex-direction: column;
     align-items: center;
-  }
-
-  .stats-bar {
-    flex-direction: column;
-    gap: 24px;
   }
 }
 </style>
