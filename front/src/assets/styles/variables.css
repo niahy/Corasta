@@ -1,0 +1,56 @@
+/**
+ * 全局 CSS 变量
+ * 基于 UI 原型的设计令牌
+ */
+
+:root {
+  /* 主色调 */
+  --coral-pink: #ff7e8a;
+  --stardust-purple: #a68ce0;
+  --midnight-purple: #5d4f92;
+  
+  /* 辅助色 */
+  --light-pink: #ffe5ec;
+  --light-purple: #f5ecff;
+  --starry-blue: #e6f0ff;
+  
+  /* 文本色 */
+  --text-dark: #3a3550;
+  --text-light: #ffffff;
+  --text-secondary: #7a7691;
+  
+  /* 背景色 */
+  --card-bg: #ffffff;
+  --border: #f0f0f5;
+  --bg-gradient: linear-gradient(135deg, var(--starry-blue), var(--light-pink));
+  
+  /* 阴影 */
+  --shadow: 0 8px 24px rgba(93, 79, 146, 0.15);
+  --shadow-sm: 0 4px 12px rgba(93, 79, 146, 0.1);
+  
+  /* 圆角 */
+  --radius-lg: 24px;
+  --radius-sm: 12px;
+  --radius-xs: 8px;
+  
+  /* 间距 */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  
+  /* 字体 */
+  --font-family: 'Poppins', 'Microsoft YaHei', sans-serif;
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 24px;
+  
+  /* 布局 */
+  --container-max-width: 1200px;
+  --container-padding: 5%;
+}
+
