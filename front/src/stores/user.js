@@ -15,6 +15,9 @@ export const useUserStore = defineStore('user', () => {
   // 计算属性：是否已登录
   const isLoggedIn = computed(() => !!token.value && !!user.value)
 
+  // 计算属性：用户信息（兼容性）
+  const userInfo = computed(() => user.value)
+
   /**
    * 设置 token
    * @param {string} newToken - JWT token
