@@ -153,10 +153,14 @@ public class SearchServiceImpl implements SearchService {
         Specification<Article> specification = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
             String likeExpression = "%" + keyword.toLowerCase() + "%";
+            // 对于 CLOB/LONGTEXT 类型字段（content），不能直接使用 cb.lower()
+            // 解决方案：MySQL 的 LIKE 在 utf8mb4_unicode_ci collation 下默认不区分大小写
+            // 因此可以直接使用 LIKE 而不需要 LOWER() 函数
             predicates.add(cb.or(
                     cb.like(cb.lower(root.get("title")), likeExpression),
                     cb.like(cb.lower(root.get("summary")), likeExpression),
-                    cb.like(cb.lower(root.get("content")), likeExpression)
+                    // 对于 LONGTEXT 字段，MySQL 的 LIKE 在 utf8mb4_unicode_ci collation 下不区分大小写
+                    cb.like(root.get("content"), likeExpression)
             ));
             if (request.getCategoryId() != null) {
                 predicates.add(cb.equal(root.get("category").get("id"), request.getCategoryId()));
@@ -198,9 +202,10 @@ public class SearchServiceImpl implements SearchService {
         Specification<Question> specification = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
             String likeExpression = "%" + keyword.toLowerCase() + "%";
+            // 对于 CLOB/TEXT 类型字段（description），MySQL 的 LIKE 在 utf8mb4_unicode_ci collation 下不区分大小写
             predicates.add(cb.or(
                     cb.like(cb.lower(root.get("title")), likeExpression),
-                    cb.like(cb.lower(root.get("description")), likeExpression)
+                    cb.like(root.get("description"), likeExpression)
             ));
             if (request.getAuthorId() != null) {
                 predicates.add(cb.equal(root.get("user").get("id"), request.getAuthorId()));
