@@ -106,10 +106,13 @@
         <!-- 评论区域 -->
         <section class="article-comments">
           <h3 class="comments-title">评论 · {{ article.commentCount }}</h3>
-          <!-- TODO: 评论组件（第七批开发） -->
-          <div class="comments-placeholder">
-            <p>评论功能开发中...</p>
-          </div>
+          <CommentList
+            :target-type="'article'"
+            :target-id="article.id"
+            :is-author="isAuthor"
+            @comment-added="handleCommentAdded"
+            @comment-updated="handleCommentUpdated"
+          />
         </section>
 
         <!-- 相关推荐 -->
@@ -126,6 +129,69 @@
         </aside>
       </article>
 
+      <!-- 收藏夹选择对话框 -->
+      <div v-if="showFolderDialog" class="folder-dialog-overlay" @click="showFolderDialog = false">
+        <Card class="folder-dialog" @click.stop>
+          <template #header>
+            <h3 class="dialog-title">选择收藏夹</h3>
+          </template>
+          <div class="folder-dialog-content">
+            <div class="folder-list">
+              <label
+                v-for="folder in folders"
+                :key="folder.id"
+                :class="['folder-item', { active: selectedFolderId === folder.id }]"
+              >
+                <input
+                  type="radio"
+                  :value="folder.id"
+                  v-model="selectedFolderId"
+                />
+                <div class="folder-info">
+                  <div class="folder-name">{{ folder.name }}</div>
+                  <div v-if="folder.description" class="folder-description">
+                    {{ folder.description }}
+                  </div>
+                  <div class="folder-count">{{ folder.itemCount || 0 }} 个内容</div>
+                </div>
+              </label>
+            </div>
+            <div class="create-folder-section">
+              <Input
+                v-model="newFolderName"
+                placeholder="创建新收藏夹"
+                :maxlength="50"
+                @keyup.enter="handleCreateFolder"
+              >
+                <template #suffix>
+                  <Button
+                    variant="text"
+                    size="small"
+                    :loading="creatingFolder"
+                    @click="handleCreateFolder"
+                  >
+                    创建
+                  </Button>
+                </template>
+              </Input>
+            </div>
+          </div>
+          <template #footer>
+            <div class="dialog-actions">
+              <Button variant="outline" @click="showFolderDialog = false">取消</Button>
+              <Button
+                variant="primary"
+                :loading="favoriteLoading"
+                :disabled="!selectedFolderId"
+                @click="confirmFavorite"
+              >
+                确认收藏
+              </Button>
+            </div>
+          </template>
+        </Card>
+      </div>
+
       <!-- 文章不存在 -->
       <div v-else class="not-found">
         <p>文章不存在</p>
@@ -141,13 +207,14 @@ import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { getArticleDetail } from '@/api/article'
 import { likeContent, unlikeContent } from '@/api/like'
-import { favoriteContent, unfavoriteContent } from '@/api/favorite'
+import { favoriteContent, unfavoriteContent, getFolderList, createFolder } from '@/api/favorite'
 import { formatRelativeTime, formatLargeNumber } from '@/utils/format'
 import Card from '@/components/Card.vue'
 import Button from '@/components/Button.vue'
 import Badge from '@/components/Badge.vue'
 import Avatar from '@/components/Avatar.vue'
 import Loading from '@/components/Loading.vue'
+import CommentList from '@/components/CommentList.vue'
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
@@ -156,6 +223,11 @@ const article = ref(null)
 const loading = ref(false)
 const likeLoading = ref(false)
 const favoriteLoading = ref(false)
+const showFolderDialog = ref(false)
+const folders = ref([])
+const selectedFolderId = ref(null)
+const newFolderName = ref('')
+const creatingFolder = ref(false)
 
 const isAuthor = computed(() => {
   return article.value && userStore.userInfo && article.value.author.id === userStore.userInfo.id
@@ -241,6 +313,43 @@ async function handleLike() {
   }
 }
 
+// 获取收藏夹列表
+async function fetchFolders() {
+  try {
+    const response = await getFolderList()
+    if (response.data && response.data.items) {
+      folders.value = response.data.items
+    }
+  } catch (error) {
+    console.error('获取收藏夹列表失败:', error)
+  }
+}
+
+// 创建收藏夹
+async function handleCreateFolder() {
+  if (!newFolderName.value.trim()) {
+    alert('请输入收藏夹名称')
+    return
+  }
+
+  creatingFolder.value = true
+  try {
+    const response = await createFolder({
+      name: newFolderName.value.trim(),
+    })
+    if (response.data) {
+      folders.value.push(response.data)
+      selectedFolderId.value = response.data.id
+      newFolderName.value = ''
+    }
+  } catch (error) {
+    console.error('创建收藏夹失败:', error)
+    alert(error.message || '创建失败，请重试')
+  } finally {
+    creatingFolder.value = false
+  }
+}
+
 // 收藏/取消收藏
 async function handleFavorite() {
   if (!userStore.isLoggedIn) {
@@ -248,23 +357,49 @@ async function handleFavorite() {
     return
   }
 
-  favoriteLoading.value = true
-  try {
-    if (article.value.isFavorited) {
+  // 如果已收藏，直接取消收藏
+  if (article.value.isFavorited) {
+    favoriteLoading.value = true
+    try {
       await unfavoriteContent('article', article.value.id)
       article.value.isFavorited = false
       article.value.favoriteCount -= 1
-    } else {
-      await favoriteContent({
-        targetType: 'article',
-        targetId: article.value.id,
-      })
-      article.value.isFavorited = true
-      article.value.favoriteCount += 1
+    } catch (error) {
+      console.error('取消收藏失败:', error)
+      alert(error.message || '操作失败，请重试')
+    } finally {
+      favoriteLoading.value = false
     }
+    return
+  }
+
+  // 如果未收藏，显示收藏夹选择对话框
+  await fetchFolders()
+  selectedFolderId.value = folders.value.length > 0 ? folders.value[0].id : null
+  showFolderDialog.value = true
+}
+
+// 确认收藏
+async function confirmFavorite() {
+  if (!selectedFolderId.value) {
+    alert('请选择收藏夹')
+    return
+  }
+
+  favoriteLoading.value = true
+  try {
+    await favoriteContent({
+      targetType: 'article',
+      targetId: article.value.id,
+      folderId: selectedFolderId.value,
+    })
+    article.value.isFavorited = true
+    article.value.favoriteCount += 1
+    showFolderDialog.value = false
+    selectedFolderId.value = null
   } catch (error) {
-    console.error('收藏操作失败:', error)
-    alert(error.message || '操作失败，请重试')
+    console.error('收藏失败:', error)
+    alert(error.message || '收藏失败，请重试')
   } finally {
     favoriteLoading.value = false
   }
@@ -279,6 +414,18 @@ function handleShare() {
   }).catch(() => {
     alert('复制失败，请手动复制链接')
   })
+}
+
+// 评论添加后更新计数
+function handleCommentAdded() {
+  if (article.value) {
+    article.value.commentCount += 1
+  }
+}
+
+// 评论更新后刷新详情
+function handleCommentUpdated() {
+  fetchArticleDetail()
 }
 
 // 组件挂载时获取数据
@@ -509,6 +656,105 @@ onMounted(() => {
   font-size: 20px;
   color: var(--text-dark);
   margin-bottom: 24px;
+}
+
+.folder-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.folder-dialog {
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.dialog-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--midnight-purple);
+  margin: 0;
+}
+
+.folder-dialog-content {
+  padding: 20px 0;
+}
+
+.folder-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.folder-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.folder-item:hover {
+  border-color: var(--coral-pink);
+  background: rgba(255, 126, 138, 0.05);
+}
+
+.folder-item.active {
+  border-color: var(--coral-pink);
+  background: rgba(255, 126, 138, 0.1);
+}
+
+.folder-item input[type="radio"] {
+  margin-top: 4px;
+  cursor: pointer;
+}
+
+.folder-info {
+  flex: 1;
+}
+
+.folder-name {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--midnight-purple);
+  margin-bottom: 4px;
+}
+
+.folder-description {
+  font-size: 13px;
+  color: var(--text-dark);
+  opacity: 0.7;
+  margin-bottom: 4px;
+}
+
+.folder-count {
+  font-size: 12px;
+  color: var(--text-dark);
+  opacity: 0.6;
+}
+
+.create-folder-section {
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
 }
 
 @media (max-width: 768px) {
