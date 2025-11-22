@@ -3,10 +3,12 @@ package com.example.back.controller;
 import com.example.back.common.Result;
 import com.example.back.dto.request.LoginRequest;
 import com.example.back.dto.request.RegisterRequest;
+import com.example.back.dto.response.CaptchaResponse;
 import com.example.back.dto.response.LoginResponse;
 import com.example.back.dto.response.RegisterResponse;
 import com.example.back.dto.response.SecurityQuestionResponse;
 import com.example.back.service.AuthService;
+import com.example.back.service.CaptchaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,6 +25,13 @@ import java.util.List;
 public class AuthController {
 
     private final AuthService authService;
+    private final CaptchaService captchaService;
+
+    @GetMapping("/captcha")
+    public Result<CaptchaResponse> getCaptcha() {
+        CaptchaResponse response = captchaService.generateCaptcha();
+        return Result.success(response);
+    }
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)

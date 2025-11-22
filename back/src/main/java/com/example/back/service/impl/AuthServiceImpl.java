@@ -14,6 +14,7 @@ import com.example.back.exception.ValidationException;
 import com.example.back.repository.SecurityQuestionRepository;
 import com.example.back.repository.UserRepository;
 import com.example.back.service.AuthService;
+import com.example.back.service.CaptchaService;
 import com.example.back.util.JwtUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -34,10 +35,16 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final SecurityQuestionRepository securityQuestionRepository;
     private final JwtUtil jwtUtil;
+    private final CaptchaService captchaService;
 
     @Override
     @Transactional
     public RegisterResponse register(RegisterRequest request) {
+        // 验证验证码
+        if (!captchaService.verifyCaptcha(request.getCaptchaKey(), request.getCaptcha())) {
+            throw new ValidationException("验证码错误或已过期");
+        }
+
         if (!request.getPassword().equals(request.getConfirmPassword())) {
             throw new ValidationException("两次输入的密码不一致");
         }
@@ -73,6 +80,13 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public LoginResponse login(LoginRequest request) {
+        // 验证验证码（如果提供了验证码）
+        if (request.getCaptchaKey() != null && request.getCaptcha() != null) {
+            if (!captchaService.verifyCaptcha(request.getCaptchaKey(), request.getCaptcha())) {
+                throw new ValidationException("验证码错误或已过期");
+            }
+        }
+
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new NotFoundException("用户不存在"));
         if (!user.getPassword().equals(request.getPassword())) {
