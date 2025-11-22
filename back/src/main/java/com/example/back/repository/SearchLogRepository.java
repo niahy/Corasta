@@ -13,7 +13,8 @@ import java.util.List;
  */
 public interface SearchLogRepository extends JpaRepository<SearchLog, Long> {
 
-    @Query("select distinct l.keyword from SearchLog l where lower(l.keyword) like lower(concat(:keyword, '%')) order by l.createdAt desc")
+    // 使用 GROUP BY 替代 DISTINCT，这样可以在 ORDER BY 中使用 created_at
+    @Query("select l.keyword from SearchLog l where lower(l.keyword) like lower(concat(:keyword, '%')) group by l.keyword order by max(l.createdAt) desc")
     List<String> findSuggestions(String keyword, Pageable pageable);
 
     @Query("select l.keyword, count(l) from SearchLog l where l.createdAt >= :start group by l.keyword order by count(l) desc")
