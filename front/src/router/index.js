@@ -19,18 +19,18 @@ const router = createRouter({
       }
     },
     {
-      path: '/auth/login',
+      path: '/login',
       name: 'login',
-      component: () => import('@/views/auth/Login.vue'),
+      component: () => import('@/views/Auth.vue'),
       meta: {
         title: '登录',
         requiresAuth: false
       }
     },
     {
-      path: '/auth/register',
+      path: '/register',
       name: 'register',
-      component: () => import('@/views/auth/Register.vue'),
+      component: () => import('@/views/Auth.vue'),
       meta: {
         title: '注册',
         requiresAuth: false
