@@ -3,6 +3,7 @@ package com.example.back.repository;
 import com.example.back.entity.Answer;
 import com.example.back.entity.AnswerVote;
 import com.example.back.entity.User;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -15,6 +16,7 @@ public interface AnswerVoteRepository extends JpaRepository<AnswerVote, Long> {
 
     Optional<AnswerVote> findByAnswerAndUser(Answer answer, User user);
 
+    @EntityGraph(attributePaths = {"answer"})
     List<AnswerVote> findByAnswer_IdInAndUser_Id(List<Long> answerIds, Long userId);
 }
 

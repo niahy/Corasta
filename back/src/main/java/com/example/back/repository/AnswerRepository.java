@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 回答仓库
@@ -27,6 +28,14 @@ public interface AnswerRepository extends JpaRepository<Answer, Long>, JpaSpecif
     @Override
     @EntityGraph(attributePaths = {"user", "question", "question.user"})
     List<Answer> findAllById(Iterable<Long> ids);
+
+    @Override
+    @EntityGraph(attributePaths = {"user", "question", "question.user"})
+    Page<Answer> findAll(org.springframework.data.jpa.domain.Specification<Answer> spec, Pageable pageable);
+
+    @Override
+    @EntityGraph(attributePaths = {"user", "question", "question.user"})
+    Optional<Answer> findById(Long id);
 
     List<Answer> findTop5ByUser_IdOrderByCreatedAtDesc(Long userId);
 

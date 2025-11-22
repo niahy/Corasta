@@ -4,6 +4,7 @@ import com.example.back.entity.Favorite;
 import com.example.back.entity.FavoriteFolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
@@ -19,5 +20,9 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long>, JpaSp
     Long countByFolder(FavoriteFolder folder);
 
     Page<Favorite> findByUser_IdOrderByCreatedAtDesc(Long userId, Pageable pageable);
+
+    @Override
+    @EntityGraph(attributePaths = {"folder"})
+    Page<Favorite> findAll(org.springframework.data.jpa.domain.Specification<Favorite> spec, Pageable pageable);
 }
 

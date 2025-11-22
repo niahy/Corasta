@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 问题仓库
@@ -19,6 +20,14 @@ public interface QuestionRepository extends JpaRepository<Question, Long>, JpaSp
     @Override
     @EntityGraph(attributePaths = {"user"})
     List<Question> findAllById(Iterable<Long> ids);
+
+    @Override
+    @EntityGraph(attributePaths = {"user", "relatedArticle", "relatedArticle.user", "tags"})
+    Page<Question> findAll(org.springframework.data.jpa.domain.Specification<Question> spec, Pageable pageable);
+
+    @Override
+    @EntityGraph(attributePaths = {"user", "relatedArticle", "relatedArticle.user", "tags", "bestAnswer"})
+    Optional<Question> findById(Long id);
 
     @EntityGraph(attributePaths = {"user"})
     Page<Question> findByUser_IdIn(List<Long> userIds, Pageable pageable);

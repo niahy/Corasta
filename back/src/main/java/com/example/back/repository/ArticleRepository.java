@@ -21,7 +21,16 @@ public interface ArticleRepository extends JpaRepository<Article, Long>, JpaSpec
     @EntityGraph(attributePaths = {"user"})
     List<Article> findAllById(Iterable<Long> ids);
 
+    @Override
+    @EntityGraph(attributePaths = {"user", "category", "tags"})
+    Optional<Article> findById(Long id);
+
+    @EntityGraph(attributePaths = {"user", "category", "tags"})
     Optional<Article> findBySlug(String slug);
+
+    @Override
+    @EntityGraph(attributePaths = {"user", "category", "tags"})
+    Page<Article> findAll(org.springframework.data.jpa.domain.Specification<Article> spec, Pageable pageable);
 
     @EntityGraph(attributePaths = {"user"})
     Page<Article> findByUser_IdIn(List<Long> userIds, Pageable pageable);
