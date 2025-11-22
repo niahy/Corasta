@@ -14,8 +14,10 @@ export function register(data) {
   return request.post('/auth/register', data)
 }
 
+
 /**
  * 获取验证码
+ * 
  * @returns {Promise}
  */
 export function getCaptcha() {
