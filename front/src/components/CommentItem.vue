@@ -154,12 +154,12 @@ const showReplies = ref(true)
 
 // 权限判断
 const canEdit = computed(() => {
-  return userStore.userInfo && comment.author.id === userStore.userInfo.id
+  return userStore.userInfo && props.comment.author.id === userStore.userInfo.id
 })
 
 const canDelete = computed(() => {
   return (
-    (userStore.userInfo && comment.author.id === userStore.userInfo.id) ||
+    (userStore.userInfo && props.comment.author.id === userStore.userInfo.id) ||
     props.isAuthor // 内容作者可以删除自己内容下的评论
   )
 })
@@ -170,9 +170,9 @@ const canPin = computed(() => {
 
 // 渲染评论内容（简单 Markdown）
 const renderedContent = computed(() => {
-  if (!comment.content) return ''
+  if (!props.comment.content) return ''
   
-  let content = comment.content
+  let content = props.comment.content
   // 转义 HTML
   content = content
     .replace(/&/g, '&amp;')
@@ -201,7 +201,7 @@ const renderedContent = computed(() => {
 // 开始编辑
 function startEdit() {
   isEditing.value = true
-  editContent.value = comment.content
+  editContent.value = props.comment.content
 }
 
 // 取消编辑
@@ -219,11 +219,11 @@ async function saveEdit() {
 
   updating.value = true
   try {
-    await updateComment(comment.id, {
+    await updateComment(props.comment.id, {
       content: editContent.value.trim(),
     })
     isEditing.value = false
-    emit('edit', comment.id)
+    emit('edit', props.comment.id)
   } catch (error) {
     console.error('更新评论失败:', error)
     alert(error.message || '更新失败，请重试')
@@ -241,16 +241,16 @@ async function handleLike() {
 
   likeLoading.value = true
   try {
-    if (comment.isLiked) {
-      await unlikeComment(comment.id)
-      comment.isLiked = false
-      comment.likeCount = (comment.likeCount || 0) - 1
+    if (props.comment.isLiked) {
+      await unlikeComment(props.comment.id)
+      props.comment.isLiked = false
+      props.comment.likeCount = (props.comment.likeCount || 0) - 1
     } else {
-      await likeComment(comment.id)
-      comment.isLiked = true
-      comment.likeCount = (comment.likeCount || 0) + 1
+      await likeComment(props.comment.id)
+      props.comment.isLiked = true
+      props.comment.likeCount = (props.comment.likeCount || 0) + 1
     }
-    emit('like', comment.id)
+    emit('like', props.comment.id)
   } catch (error) {
     console.error('点赞操作失败:', error)
     alert(error.message || '操作失败，请重试')
@@ -261,7 +261,7 @@ async function handleLike() {
 
 // 回复
 function handleReplyClick() {
-  emit('reply', comment)
+  emit('reply', props.comment)
 }
 
 // 删除
@@ -271,8 +271,8 @@ async function handleDeleteClick() {
   }
 
   try {
-    await deleteComment(comment.id)
-    emit('delete', comment.id)
+    await deleteComment(props.comment.id)
+    emit('delete', props.comment.id)
   } catch (error) {
     console.error('删除评论失败:', error)
     alert(error.message || '删除失败，请重试')
@@ -281,16 +281,16 @@ async function handleDeleteClick() {
 
 // 编辑
 function handleEdit() {
-  emit('edit', comment.id)
+  emit('edit', props.comment.id)
 }
 
 // 置顶
 async function handlePinClick() {
   pinLoading.value = true
   try {
-    await pinComment(comment.id)
-    comment.isPinned = !comment.isPinned
-    emit('pin', comment.id)
+    await pinComment(props.comment.id)
+    props.comment.isPinned = !props.comment.isPinned
+    emit('pin', props.comment.id)
   } catch (error) {
     console.error('置顶操作失败:', error)
     alert(error.message || '操作失败，请重试')

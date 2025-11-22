@@ -10,7 +10,7 @@ defineProps({
     type: String,
     default: 'default',
     validator: (value) =>
-      ['default', 'primary', 'success', 'warning', 'danger', 'info'].includes(value),
+      ['default', 'primary', 'secondary', 'success', 'warning', 'danger', 'info'].includes(value),
   },
   size: {
     type: String,
@@ -74,6 +74,12 @@ defineProps({
 .badge-info {
   background: var(--starry-blue);
   color: var(--midnight-purple);
+}
+
+.badge-secondary {
+  background: var(--light-purple);
+  color: var(--midnight-purple);
+  opacity: 0.8;
 }
 </style>
 

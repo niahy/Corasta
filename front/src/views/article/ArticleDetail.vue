@@ -215,6 +215,7 @@ import Badge from '@/components/Badge.vue'
 import Avatar from '@/components/Avatar.vue'
 import Loading from '@/components/Loading.vue'
 import CommentList from '@/components/CommentList.vue'
+import Input from '@/components/Input.vue'
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
