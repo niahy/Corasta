@@ -50,6 +50,7 @@ public class FeedServiceImpl implements FeedService {
 
     private PageResult<FeedItemResponse> buildArticleFeed(List<Long> userIds, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        // 使用 @EntityGraph 预加载 user 关联
         Page<Article> articlePage = articleRepository.findByUser_IdIn(userIds, pageable);
         List<FeedItemResponse> items = articlePage.stream()
                 .map(this::toArticleFeedItem)
@@ -59,6 +60,7 @@ public class FeedServiceImpl implements FeedService {
 
     private PageResult<FeedItemResponse> buildQuestionFeed(List<Long> userIds, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        // 使用 @EntityGraph 预加载 user 关联
         Page<Question> questionPage = questionRepository.findByUser_IdIn(userIds, pageable);
         List<FeedItemResponse> items = questionPage.stream()
                 .map(this::toQuestionFeedItem)
@@ -70,6 +72,7 @@ public class FeedServiceImpl implements FeedService {
         int fetchSize = Math.min(500, (page + 1) * size * MAX_FETCH_MULTIPLIER);
         Pageable fetchPageable = PageRequest.of(0, fetchSize, Sort.by(Sort.Direction.DESC, "createdAt"));
 
+        // 使用 @EntityGraph 预加载 user 关联
         List<FeedItemResponse> articleItems = articleRepository.findByUser_IdIn(userIds, fetchPageable).stream()
                 .map(this::toArticleFeedItem)
                 .collect(Collectors.toList());

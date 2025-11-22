@@ -3,6 +3,7 @@ package com.example.back.repository;
 import com.example.back.entity.Article;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -18,6 +19,7 @@ public interface ArticleRepository extends JpaRepository<Article, Long>, JpaSpec
 
     Optional<Article> findBySlug(String slug);
 
+    @EntityGraph(attributePaths = {"user"})
     Page<Article> findByUser_IdIn(List<Long> userIds, Pageable pageable);
 
     long countByUser_IdIn(List<Long> userIds);
