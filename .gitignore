@@ -1,0 +1,13 @@
+# IDE 配置
+.idea/
+
+# UI 原型文件
+UI/
+
+# 文档目录
+docs/
+
+# 前端开发文档
+front/代码检查报告.md
+front/开发规范.md
+
