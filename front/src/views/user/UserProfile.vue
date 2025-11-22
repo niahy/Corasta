@@ -89,8 +89,8 @@
                 @click="goToArticle(article.id)"
               >
                 <Card hover>
-                  <div v-if="article.coverImage" class="content-cover">
-                    <img :src="article.coverImage" :alt="article.title" />
+                  <div v-if="article.coverImage && !coverImageErrors[article.id]" class="content-cover">
+                    <img :src="article.coverImage" :alt="article.title" @error="coverImageErrors[article.id] = true" />
                   </div>
                   <div class="content-body">
                     <div class="content-meta">
@@ -244,6 +244,7 @@ const userStore = useUserStore()
 const profile = ref(null)
 const loading = ref(false)
 const followLoading = ref(false)
+const coverImageErrors = ref({})
 
 // 标签配置
 const tabs = [

@@ -70,7 +70,7 @@
               <div class="meta-field">
                 <label>封面图</label>
                 <div class="cover-upload">
-                  <img v-if="form.coverImage" :src="form.coverImage" alt="封面" class="cover-preview" />
+                  <img v-if="form.coverImage && !coverImageError" :src="form.coverImage" alt="封面" class="cover-preview" @error="coverImageError = true" />
                   <div v-else class="cover-placeholder">
                     <span>点击上传封面图</span>
                   </div>
@@ -197,6 +197,12 @@ const categories = ref([]) // TODO: 从分类API获取
 const previewMode = ref('split') // edit, preview, split
 const saving = ref(false)
 const publishing = ref(false)
+const coverImageError = ref(false)
+
+// 监听封面图变化，重置错误状态
+watch(() => form.coverImage, () => {
+  coverImageError.value = false
+})
 
 // 自动保存定时器
 let autoSaveTimer = null
@@ -228,8 +234,8 @@ const renderedPreview = computed(() => {
   // 链接
   content = content.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>')
   
-  // 图片
-  content = content.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" />')
+  // 图片（添加错误处理）
+  content = content.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" onerror="this.style.display=\'none\'" />')
   
   // 换行
   content = content.replace(/\n/g, '<br>')

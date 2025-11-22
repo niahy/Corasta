@@ -4,15 +4,15 @@
     :style="avatarStyle"
     @click="handleClick"
   >
-    <img v-if="src" :src="src" :alt="alt" />
-    <span v-else class="avatar-placeholder">{{ placeholderText }}</span>
+    <img v-if="src && !imageError" :src="src" :alt="alt" @error="handleImageError" />
+    <span v-if="!src || imageError" class="avatar-placeholder">{{ placeholderText }}</span>
     <span v-if="online" class="avatar-online"></span>
   </div>
 </template>
 
 
 <script setup>
-import { computed, defineProps, defineEmits } from 'vue';
+import { computed, ref, defineProps, defineEmits, watch } from 'vue';
 
 const props = defineProps({
   src: {
@@ -44,6 +44,13 @@ const props = defineProps({
 
 const emit = defineEmits(['click']);
 
+const imageError = ref(false);
+
+// 当 src 改变时，重置错误状态
+watch(() => props.src, () => {
+  imageError.value = false;
+});
+
 const placeholderText = computed(() => {
   if (props.name) {
     return props.name.charAt(0).toUpperCase();
@@ -52,13 +59,17 @@ const placeholderText = computed(() => {
 });
 
 const avatarStyle = computed(() => {
-  if (!props.src) {
+  if (!props.src || imageError.value) {
     return {
       background: 'linear-gradient(135deg, var(--coral-pink), var(--stardust-purple))',
     };
   }
   return {};
 });
+
+const handleImageError = () => {
+  imageError.value = true;
+};
 
 const handleClick = () => {
   if (props.clickable) {

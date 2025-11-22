@@ -37,8 +37,8 @@
         </header>
 
         <!-- 封面图 -->
-        <div v-if="article.coverImage" class="article-cover">
-          <img :src="article.coverImage" :alt="article.title" />
+        <div v-if="article.coverImage && !coverImageError" class="article-cover">
+          <img :src="article.coverImage" :alt="article.title" @error="coverImageError = true" />
         </div>
 
         <!-- 文章正文 -->
@@ -229,6 +229,7 @@ const folders = ref([])
 const selectedFolderId = ref(null)
 const newFolderName = ref('')
 const creatingFolder = ref(false)
+const coverImageError = ref(false)
 
 const isAuthor = computed(() => {
   return article.value && userStore.userInfo && article.value.author.id === userStore.userInfo.id
@@ -261,8 +262,8 @@ const renderedContent = computed(() => {
   // 链接
   content = content.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>')
   
-  // 图片
-  content = content.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" />')
+  // 图片（添加错误处理）
+  content = content.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" onerror="this.style.display=\'none\'" />')
   
   // 换行
   content = content.replace(/\n/g, '<br>')
@@ -273,6 +274,7 @@ const renderedContent = computed(() => {
 // 获取文章详情
 async function fetchArticleDetail() {
   loading.value = true
+  coverImageError.value = false
   try {
     const id = route.params.id
     const response = await getArticleDetail(id)

@@ -72,8 +72,8 @@
           >
             <Card hover>
               <div class="article-item-content">
-                <div v-if="article.coverImage" class="article-cover">
-                  <img :src="article.coverImage" :alt="article.title" />
+                <div v-if="article.coverImage && !coverImageErrors[article.id]" class="article-cover">
+                  <img :src="article.coverImage" :alt="article.title" @error="coverImageErrors[article.id] = true" />
                 </div>
                 <div class="article-info">
                   <div class="article-meta">
@@ -172,6 +172,7 @@ const items = ref([])
 const categories = ref([]) // TODO: 从分类API获取
 const loading = ref(false)
 const loadingMore = ref(false)
+const coverImageErrors = ref({})
 const pagination = ref({
   page: 1,
   pageSize: 20,

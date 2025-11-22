@@ -65,8 +65,8 @@
                   <p v-if="item.content.summary" class="feed-item-summary">
                     {{ item.content.summary }}
                   </p>
-                  <div v-if="item.content.coverImage" class="feed-item-cover">
-                    <img :src="item.content.coverImage" :alt="item.content.title" />
+                  <div v-if="item.content.coverImage && !coverImageErrors[`${item.type}-${item.content.id}`]" class="feed-item-cover">
+                    <img :src="item.content.coverImage" :alt="item.content.title" @error="coverImageErrors[`${item.type}-${item.content.id}`] = true" />
                   </div>
                 </div>
 
@@ -182,6 +182,7 @@ const activeTab = ref('all')
 const items = ref([])
 const loading = ref(false)
 const loadingMore = ref(false)
+const coverImageErrors = ref({})
 const pagination = ref({
   page: 1,
   pageSize: 20,
