@@ -546,10 +546,10 @@ CREATE TABLE IF NOT EXISTS `admin_operations` (
 -- 1. 用户数据
 INSERT INTO `users` (`id`, `username`, `password`, `nickname`, `avatar`, `bio`, `status`, `role`, `created_at`) VALUES
 (1, 'admin', 'admin123', '管理员', NULL, '系统管理员', 1, 1, NOW()),
-(2, 'alice', 'alice123', '星屿', 'https://via.placeholder.com/150', '热爱写作的文艺青年，喜欢记录生活中的美好瞬间', 1, 0, NOW()),
-(3, 'bob', 'bob123', 'Limer', 'https://via.placeholder.com/150', '技术爱好者，专注于前端开发', 1, 0, NOW()),
-(4, 'charlie', 'charlie123', '墨染', 'https://via.placeholder.com/150', '摄影爱好者，用镜头捕捉世界', 1, 0, NOW()),
-(5, 'diana', 'diana123', '清风', 'https://via.placeholder.com/150', '喜欢阅读和分享，追求内心的平静', 1, 0, NOW());
+(2, 'alice', 'alice123', '星屿', 'https://picsum.photos/150/150?random=1', '热爱写作的文艺青年，喜欢记录生活中的美好瞬间', 1, 0, NOW()),
+(3, 'bob', 'bob123', 'Limer', 'https://picsum.photos/150/150?random=2', '技术爱好者，专注于前端开发', 1, 0, NOW()),
+(4, 'charlie', 'charlie123', '墨染', 'https://picsum.photos/150/150?random=3', '摄影爱好者，用镜头捕捉世界', 1, 0, NOW()),
+(5, 'diana', 'diana123', '清风', 'https://picsum.photos/150/150?random=4', '喜欢阅读和分享，追求内心的平静', 1, 0, NOW());
 
 -- 2. 用户隐私设置
 INSERT INTO `user_privacy_settings` (`user_id`, `homepage_visible`, `content_visible`) VALUES
@@ -593,7 +593,7 @@ INSERT INTO `articles` (`id`, `user_id`, `title`, `content`, `summary`, `cover_i
 
 写作，就是要把这种感觉记录下来。用文字，把那些美好的瞬间，永远地保存下来。', 
 '用文字记录夏夜的美好，感受薄荷般的清凉', 
-'https://via.placeholder.com/800x400', 1, 1, 2300, 156, 23, 89, NOW() - INTERVAL 5 DAY, NOW() - INTERVAL 5 DAY),
+'https://picsum.photos/800/400?random=1', 1, 1, 2300, 156, 23, 89, NOW() - INTERVAL 5 DAY, NOW() - INTERVAL 5 DAY),
 
 (2, 3, '粉色玻璃：青春故事里的五种光', 
 '## 青春的色彩
@@ -620,7 +620,7 @@ INSERT INTO `articles` (`id`, `user_id`, `title`, `content`, `summary`, `cover_i
 
 成长之光，虽然痛苦，但最终会让我们变得更强大。', 
 '透过粉色玻璃，看青春的五种光', 
-'https://via.placeholder.com/800x400', 1, 1, 4600, 289, 45, 156, NOW() - INTERVAL 3 DAY, NOW() - INTERVAL 3 DAY),
+'https://picsum.photos/800/400?random=2', 1, 1, 4600, 289, 45, 156, NOW() - INTERVAL 3 DAY, NOW() - INTERVAL 3 DAY),
 
 (3, 3, 'Vue 3 Composition API 实战指南', 
 '## 什么是 Composition API？
@@ -651,7 +651,7 @@ export default {
 2. 更清晰的代码组织
 3. 更好的 TypeScript 支持', 
 '深入理解 Vue 3 Composition API 的使用方法和优势', 
-'https://via.placeholder.com/800x400', 2, 1, 3200, 198, 34, 112, NOW() - INTERVAL 2 DAY, NOW() - INTERVAL 2 DAY),
+'https://picsum.photos/800/400?random=3', 2, 1, 3200, 198, 34, 112, NOW() - INTERVAL 2 DAY, NOW() - INTERVAL 2 DAY),
 
 (4, 4, '城市夜景摄影技巧分享', 
 '## 夜景摄影的魅力
@@ -674,7 +674,7 @@ export default {
 
 适当的后期处理，能让照片更加出彩。', 
 '分享城市夜景摄影的技巧和经验', 
-'https://via.placeholder.com/800x400', 4, 1, 1800, 124, 18, 67, NOW() - INTERVAL 1 DAY, NOW() - INTERVAL 1 DAY),
+'https://picsum.photos/800/400?random=4', 4, 1, 1800, 124, 18, 67, NOW() - INTERVAL 1 DAY, NOW() - INTERVAL 1 DAY),
 
 (5, 5, '生活中的小确幸', 
 '## 什么是小确幸？
@@ -697,7 +697,7 @@ export default {
 
 让我们珍惜生活中的每一个小确幸。', 
 '记录生活中的小确幸，感受生活的美好', 
-'https://via.placeholder.com/800x400', 3, 1, 1500, 98, 15, 45, NOW() - INTERVAL 1 DAY, NOW() - INTERVAL 1 DAY);
+'https://picsum.photos/800/400?random=5', 3, 1, 1500, 98, 15, 45, NOW() - INTERVAL 1 DAY, NOW() - INTERVAL 1 DAY);
 
 -- 6. 文章标签关联
 INSERT INTO `article_tags` (`article_id`, `tag_id`) VALUES
