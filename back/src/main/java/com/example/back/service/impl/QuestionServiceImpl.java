@@ -173,8 +173,12 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     private Question loadQuestion(Long id) {
-        return questionRepository.findById(id)
+        Question question = questionRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("问题不存在"));
+        if (question.getDeletedAt() != null) {
+            throw new NotFoundException("问题不存在");
+        }
+        return question;
     }
 
     private void ensureOwner(Question question, Long userId) {

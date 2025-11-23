@@ -151,8 +151,12 @@ public class AnswerServiceImpl implements AnswerService {
     }
 
     private Answer loadAnswer(Long id) {
-        return answerRepository.findById(id)
+        Answer answer = answerRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("回答不存在"));
+        if (answer.getDeletedAt() != null) {
+            throw new NotFoundException("回答不存在");
+        }
+        return answer;
     }
 
     private void ensureOwner(Answer answer, Long userId) {

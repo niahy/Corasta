@@ -240,11 +240,19 @@ public class ArticleServiceImpl implements ArticleService {
         }
         try {
             Long id = Long.parseLong(identifier);
-            return articleRepository.findById(id)
+            Article article = articleRepository.findById(id)
                     .orElseThrow(() -> new NotFoundException("文章不存在"));
+            if (article.getDeletedAt() != null) {
+                throw new NotFoundException("文章不存在");
+            }
+            return article;
         } catch (NumberFormatException ex) {
-            return articleRepository.findBySlug(identifier)
+            Article article = articleRepository.findBySlug(identifier)
                     .orElseThrow(() -> new NotFoundException("文章不存在"));
+            if (article.getDeletedAt() != null) {
+                throw new NotFoundException("文章不存在");
+            }
+            return article;
         }
     }
 
