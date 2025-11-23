@@ -37,6 +37,7 @@ public interface AnswerRepository extends JpaRepository<Answer, Long>, JpaSpecif
     @EntityGraph(attributePaths = {"user", "question", "question.user"})
     Optional<Answer> findById(Long id);
 
+    @EntityGraph(attributePaths = {"user", "question", "question.user"})
     List<Answer> findTop5ByUser_IdOrderByCreatedAtDesc(Long userId);
 
     @Query("select coalesce(sum(a.upvoteCount), 0) from Answer a where a.user.id = :userId")

@@ -5,6 +5,7 @@ import com.example.back.common.Result;
 import com.example.back.dto.request.DashboardContentQueryRequest;
 import com.example.back.dto.request.InteractionHistoryRequest;
 import com.example.back.dto.response.DashboardContentItemResponse;
+import com.example.back.dto.response.DashboardContentResponse;
 import com.example.back.dto.response.DashboardOverviewResponse;
 import com.example.back.dto.response.DashboardTrendResponse;
 import com.example.back.dto.response.InteractionHistoryItemResponse;
@@ -28,6 +29,11 @@ public class DashboardController {
     @GetMapping("/overview")
     public Result<DashboardOverviewResponse> overview() {
         return Result.success(dashboardService.getOverview());
+    }
+
+    @GetMapping("/content")
+    public Result<DashboardContentResponse> content() {
+        return Result.success(dashboardService.getContent());
     }
 
     @GetMapping("/contents")

@@ -6,6 +6,7 @@ import com.example.back.context.AuthContextHolder;
 import com.example.back.dto.request.DashboardContentQueryRequest;
 import com.example.back.dto.request.InteractionHistoryRequest;
 import com.example.back.dto.response.*;
+import com.example.back.dto.response.DashboardContentResponse;
 import com.example.back.entity.*;
 import com.example.back.repository.*;
 import com.example.back.service.DashboardService;
@@ -82,6 +83,79 @@ public class DashboardServiceImpl implements DashboardService {
                 .stats(stats)
                 .recentContents(recentContents)
                 .pendingItems(todoItems)
+                .build();
+    }
+
+    @Override
+    public DashboardContentResponse getContent() {
+        Long userId = AuthContextHolder.requireUserId();
+
+        long articleCount = articleRepository.countByUser_Id(userId);
+        long questionCount = questionRepository.countByUser_Id(userId);
+        long answerCount = answerRepository.countByUser_Id(userId);
+
+        long totalViews = articleRepository.sumViewCountByUser(userId)
+                + questionRepository.sumViewCountByUser(userId);
+        long totalLikes = articleRepository.sumLikeCountByUser(userId)
+                + answerRepository.sumUpvoteCountByUser(userId);
+        long totalComments = articleRepository.sumCommentCountByUser(userId)
+                + answerRepository.sumCommentCountByUser(userId);
+
+        DashboardContentResponse.Statistics statistics = DashboardContentResponse.Statistics.builder()
+                .articleCount(articleCount)
+                .questionCount(questionCount)
+                .answerCount(answerCount)
+                .totalViewCount(totalViews)
+                .totalLikeCount(totalLikes)
+                .totalCommentCount(totalComments)
+                .build();
+
+        List<DashboardContentResponse.RecentItem> recentArticles = articleRepository
+                .findTop5ByUser_IdOrderByCreatedAtDesc(userId)
+                .stream()
+                .map(article -> DashboardContentResponse.RecentItem.builder()
+                        .id(article.getId())
+                        .title(article.getTitle())
+                        .viewCount(article.getViewCount())
+                        .likeCount(article.getLikeCount())
+                        .commentCount(article.getCommentCount())
+                        .createdAt(article.getCreatedAt())
+                        .build())
+                .collect(Collectors.toList());
+
+        List<DashboardContentResponse.RecentItem> recentQuestions = questionRepository
+                .findTop5ByUser_IdOrderByCreatedAtDesc(userId)
+                .stream()
+                .map(question -> DashboardContentResponse.RecentItem.builder()
+                        .id(question.getId())
+                        .title(question.getTitle())
+                        .viewCount(question.getViewCount())
+                        .likeCount(question.getAnswerCount())
+                        .commentCount(question.getAnswerCount())
+                        .createdAt(question.getCreatedAt())
+                        .build())
+                .collect(Collectors.toList());
+
+        List<DashboardContentResponse.RecentItem> recentAnswers = answerRepository
+                .findTop5ByUser_IdOrderByCreatedAtDesc(userId)
+                .stream()
+                .map(answer -> DashboardContentResponse.RecentItem.builder()
+                        .id(answer.getId())
+                        .title(Optional.ofNullable(answer.getQuestion())
+                                .map(Question::getTitle)
+                                .orElse("回答"))
+                        .viewCount(answer.getUpvoteCount())
+                        .likeCount(answer.getUpvoteCount())
+                        .commentCount(answer.getCommentCount())
+                        .createdAt(answer.getCreatedAt())
+                        .build())
+                .collect(Collectors.toList());
+
+        return DashboardContentResponse.builder()
+                .statistics(statistics)
+                .recentArticles(recentArticles)
+                .recentQuestions(recentQuestions)
+                .recentAnswers(recentAnswers)
                 .build();
     }
 
