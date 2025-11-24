@@ -115,15 +115,18 @@ const handleFocus = (event) => {
   position: relative;
   display: flex;
   align-items: center;
-  background: rgba(255, 255, 255, 0.9);
-  border: 2px solid var(--border);
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-sm);
   transition: all 0.2s;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 
 .input-container:focus-within {
   border-color: var(--coral-pink);
-  box-shadow: 0 0 0 3px rgba(255, 126, 138, 0.1);
+  box-shadow: 0 0 0 3px rgba(255, 126, 138, 0.15);
 }
 
 .input-error {

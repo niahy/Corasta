@@ -69,6 +69,8 @@ const handleClick = (event) => {
   white-space: nowrap;
   position: relative;
   overflow: hidden;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 
 .btn:disabled {
@@ -96,7 +98,7 @@ const handleClick = (event) => {
 .btn-primary {
   background: linear-gradient(135deg, var(--coral-pink), var(--stardust-purple));
   color: var(--text-light);
-  box-shadow: 0 4px 12px rgba(255, 126, 138, 0.3);
+  box-shadow: 0 12px 24px rgba(255, 126, 138, 0.35);
 }
 
 .btn-primary:hover:not(:disabled) {
@@ -110,8 +112,9 @@ const handleClick = (event) => {
 
 /* 次要按钮 */
 .btn-secondary {
-  background: var(--light-purple);
+  background: var(--glass-panel-bg);
   color: var(--midnight-purple);
+  border: 1px solid var(--glass-border);
 }
 
 .btn-secondary:hover:not(:disabled) {
@@ -121,14 +124,14 @@ const handleClick = (event) => {
 
 /* 轮廓按钮 */
 .btn-outline {
-  background: transparent;
+  background: rgba(255, 255, 255, 0.05);
   color: var(--midnight-purple);
-  border: 2px solid var(--midnight-purple);
+  border: 1px solid var(--glass-border);
 }
 
 .btn-outline:hover:not(:disabled) {
-  background: var(--midnight-purple);
-  color: var(--text-light);
+  background: rgba(255, 255, 255, 0.18);
+  color: var(--coral-pink);
 }
 
 /* 文本按钮 */

@@ -34,14 +34,28 @@ defineProps({
 .card {
   background: var(--card-bg);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow);
+  box-shadow: var(--glass-shadow);
   overflow: hidden;
   transition: all 0.3s;
+  border: 1px solid var(--glass-border-soft);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  position: relative;
+}
+
+.card::after {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+  border-top: 1px solid var(--glass-highlight);
+  opacity: 0.6;
+  pointer-events: none;
 }
 
 .card-hover:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(93, 79, 146, 0.2);
+  box-shadow: 0 18px 36px rgba(93, 79, 146, 0.35);
 }
 
 .card-gradient {

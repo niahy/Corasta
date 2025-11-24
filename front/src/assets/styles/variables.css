@@ -20,9 +20,17 @@
   --text-secondary: #7a7691;
   
   /* 背景色 */
-  --card-bg: #ffffff;
-  --border: #f0f0f5;
-  --bg-gradient: linear-gradient(135deg, var(--starry-blue), var(--light-pink));
+  --card-bg: rgba(255, 255, 255, 0.18);
+  --border: rgba(255, 255, 255, 0.35);
+  --bg-gradient: radial-gradient(circle at 20% 20%, rgba(255, 231, 239, 0.8), rgba(231, 233, 255, 0.6) 35%, rgba(205, 210, 255, 0.45) 55%, rgba(172, 178, 255, 0.35) 75%, rgba(131, 136, 212, 0.25) 100%),
+    linear-gradient(135deg, rgba(34, 11, 57, 0.85), rgba(47, 16, 78, 0.9), rgba(19, 35, 83, 0.85));
+  --glass-bg: rgba(255, 255, 255, 0.12);
+  --glass-panel-bg: rgba(255, 255, 255, 0.16);
+  --glass-highlight: rgba(255, 255, 255, 0.45);
+  --glass-border: rgba(255, 255, 255, 0.35);
+  --glass-border-soft: rgba(255, 255, 255, 0.18);
+  --glass-blur: 28px;
+  --glass-shadow: 0 25px 65px rgba(57, 28, 84, 0.35);
   
   /* 阴影 */
   --shadow: 0 8px 24px rgba(93, 79, 146, 0.15);

@@ -50,6 +50,17 @@ const isLoggedIn = computed(() => userStore.isLoggedIn)
   padding: 80px 0;
 }
 
+.hero-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.08), transparent 55%);
+  border-radius: 48px;
+  filter: blur(40px);
+  z-index: 0;
+  pointer-events: none;
+}
+
 .glow-right {
   position: absolute;
   right: -120px;
@@ -65,6 +76,23 @@ const isLoggedIn = computed(() => userStore.isLoggedIn)
 .hero {
   position: relative;
   z-index: 1;
+  padding: clamp(32px, 6vw, 72px);
+  border-radius: 40px;
+  background: var(--glass-panel-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+  border-top: 1px solid var(--glass-highlight);
+  opacity: 0.6;
+  pointer-events: none;
 }
 
 .hero-content {

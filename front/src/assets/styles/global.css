@@ -14,10 +14,37 @@ body {
   font-family: var(--font-family);
   color: var(--text-dark);
   background: var(--bg-gradient);
+  background-attachment: fixed;
   min-height: 100vh;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  position: relative;
+  overflow-x: hidden;
+}
+
+body::before,
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -2;
+}
+
+body::before {
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255, 155, 170, 0.35), transparent 45%),
+    radial-gradient(circle at 80% 0%, rgba(166, 140, 224, 0.4), transparent 50%),
+    radial-gradient(circle at 50% 80%, rgba(230, 240, 255, 0.35), transparent 55%);
+  filter: blur(60px);
+}
+
+body::after {
+  background-image: linear-gradient(115deg, rgba(255, 255, 255, 0.04) 25%, transparent 25%), linear-gradient(295deg, rgba(255, 255, 255, 0.04) 25%, transparent 25%);
+  background-size: 40px 40px;
+  opacity: 0.4;
+  mix-blend-mode: soft-light;
 }
 
 img {
@@ -76,6 +103,26 @@ select {
 
 .text-secondary {
   color: var(--text-secondary);
+}
+
+.glass-surface {
+  background: var(--glass-panel-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  position: relative;
+}
+
+.glass-surface::after {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+  border-top: 1px solid var(--glass-highlight);
+  opacity: 0.6;
+  pointer-events: none;
 }
 
 .mt-sm { margin-top: var(--spacing-sm); }

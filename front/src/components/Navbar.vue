@@ -58,7 +58,9 @@ const navLinks = [
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 28px 0;
+  padding: 0;
+  width: 100%;
+  gap: 24px;
 }
 
 .brand {
